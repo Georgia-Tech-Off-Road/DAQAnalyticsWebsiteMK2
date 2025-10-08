@@ -1,0 +1,85 @@
+---
+title: Objects for DAQ Website MK2
+---
+classDiagram
+    class UserRole {
+        <<enumeration>>
+        Admin
+        DAQ
+        Offroad
+        Guest
+    }
+    class User {
+        +Role : UserRole
+    }
+    User "1" --> "0..*" Workspace
+    class Workspace {
+        ChartLayout : ?
+    }
+    Workspace "1" --> "1" DataView
+    Workspace "1" --> "0..*" Chart
+
+    note for DataView "Sensor names are defined by DAQ members in DAQ_CMBTL library"
+    class DataView {
+        +SensorNames : List~String~
+        +getGraphData(sensorNames : string, magLevel : MagnificationLevel) GraphData
+    }
+    DataView "1" *-- "0..*" DataTimeRange
+
+    class DataFile {
+        +rawFilePath : string
+        +title : string
+        +description : string
+        +date_created : string
+        +data_scheme : string | none
+    }
+    class DataTimeRange {
+        startTime : TimeStamp
+        endTime : TimeStamp
+    }
+
+
+    note for MagnificationLevel "Level refers to how many points are skipped. E.g 10 preserves only every 10th point" 
+    class MagnificationLevel {
+        <<enumeration>>
+        1
+        5
+        10
+        50
+        100
+        500
+        1000
+    }
+    class Chart {
+        settings : ...
+        sensorNames: string[]
+        magLevel : MagnificationLevel
+        range: DataTimeRange
+    }
+    note for Chart "settings property refers to all chart settings that we wish to expose to the end user"
+    note for Chart "range must be inside view's range"
+    Chart "1" --> "1" DataView
+
+    class TimeStamp {
+        microsec : int
+        sec : int
+    }
+
+    note for SensorReadings "the property names for SensorReadings should correspond with the sensor names from the data file."
+    note for SensorReadings "E.g frontRPM, rearBrake, etc."
+    class SensorReadings {
+        <<dataclass>>
+        sensor1_data : Any
+        sensor2_data : Any
+        ...
+        sensorN_data : Any
+    }
+
+    note for GraphData "xAxis and yAxis elements must correspond with each other" 
+    class GraphData {
+        <<dataclass>>
+        xAxis : List~TimeStamp~
+        yAxis : List~SensorReadings~
+    }
+    GraphData "1" --> "0..*" TimeStamp
+    GraphData "1" --> "0..*" SensorReadings

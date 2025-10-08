@@ -1,4 +1,4 @@
-name: Generate Diagrams
+name: Generate Mermaid Diagrams
 
 on:
     push:

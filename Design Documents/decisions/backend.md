@@ -1,0 +1,1 @@
+For the backend system, Express.js (based on Node.js) was chosen because it is an industry standard with good support and performance that is not too far abstracted from Node.js. 

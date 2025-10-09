@@ -4,6 +4,5 @@ The frontend portion of the website will be handled by Next.js (React based fram
 
 # Backend
 
-The backend portion of the framework will be handeled by Node.s See [decisions/backend](../decisions/backend.md).md for rationale.
-
+The backend portion of the framework will be handeled by Express.js See [decisions/backend](../decisions/backend.md).md for rationale.
 

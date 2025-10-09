@@ -1,0 +1,51 @@
+block-beta
+columns 1
+    block:L0
+        Client["Browser Client"]
+    end
+    space
+
+    block:L1
+        Frontend
+    end
+    space
+
+    block:L2
+        Backend
+    end
+    space
+
+    block:L3
+        Microservices["Python Microservices"]
+        DataReceiver["Data Receiver Server"]
+        Database
+    end
+    space
+
+    block:L4
+        DAQ["Onboard DAQ"]
+    end
+    space
+
+    block:L5
+        Sensor1
+        Sensor2
+        Sensor3
+        ...
+        SensorN
+
+Sensor1 --> DAQ
+Sensor2 --> DAQ
+Sensor3 --> DAQ
+SensorN --> DAQ
+
+L4 --> L3
+
+Microservices --> Backend
+DataReceiver --> Backend
+Database --> Backend
+
+
+L2 --> L1
+L1 --> L0
+end

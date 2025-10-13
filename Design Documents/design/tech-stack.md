@@ -6,3 +6,6 @@ The frontend portion of the website will be handled by Next.js (React based fram
 
 The backend portion of the framework will be handeled by Express.js See [decisions/backend](../decisions/backend.md).md for rationale.
 
+# Python Microservices
+
+DAQ already has a robust collection of python functions for data processing implemented in our local DAQ program. To work with this existing code, we will use Flask to expose API endpoints to call these functions. These 

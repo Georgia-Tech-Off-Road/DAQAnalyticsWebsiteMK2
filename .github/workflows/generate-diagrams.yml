@@ -3,7 +3,7 @@ name: Generate Mermaid Diagrams
 on:
     push:
         paths:
-            - 'Design Documents/diagrams/**.mmd'
+            - 'Design Documents'/diagrams/**.mmd
 jobs:
     generate:
         runs-on: ubuntu-latest

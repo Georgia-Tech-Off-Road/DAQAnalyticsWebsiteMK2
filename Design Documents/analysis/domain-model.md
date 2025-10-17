@@ -1,0 +1,1 @@
+During testing days, DAQ Members collection data in form of 

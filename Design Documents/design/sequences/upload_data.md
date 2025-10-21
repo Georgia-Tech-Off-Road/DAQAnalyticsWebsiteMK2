@@ -6,20 +6,24 @@ sequenceDiagram
         participant S as System
     end
 
-    box Database
-        participant FS as MongoDB
+    box FileSystem
+        participant FS as File System
     end
 
-    activate FS
-    activate S
-    U->>S: selectDataModel(data_model_name)
-    S->>FS: searchDataModel(data_model_name)
-    FS-->>S: data_model
-    deactivate FS
-    S-->>U: data_model
-    U->>S: viewData(data_model, view_settings)
-    S-->>U: graph data
-    deactivate S
+activate S
+U->>S: uploadData(file_name.json)
+activate FS
+S->>FS: createFolder(file_name)
+S->>FS: uploadFile(file_name_raw.json)
+U->>S: validateData(validation_settings)
+S-->>U: validation_result
+U->>S: processData(processing_settings)
+loop resolution layers
+    S->>FS: uploadFile(file_name_resolution.json)
+end
+deactivate FS
+S-->>U: postProcessSuceeded
+deactivate S
 ```
 
 # Explanation

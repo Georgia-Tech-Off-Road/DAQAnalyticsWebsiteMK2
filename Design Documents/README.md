@@ -2,9 +2,16 @@
 
 
 
-# Mission Statement and Design Ethos
+# Overview
+
+## Mission Statement
 
 As a data analytics and visualization website for Georgia Tech Offroad ("GTOR") it is the eponymous mission of this website to provide an acessible means to visualize (1) and analyze (2) data yielded from testing days and live during races, with an emphasis on the former. These goals are clarified in the paragraph below. The intended audience for this website is first and foremost the entirety of GTOR to derive insight easily from DAQ's data collection. A secondary audience of the website is DAQ members, to admnister and monitor our data collection services.
+
+
+## Design Ethos
+
+It is the objective of this website to be useful in the ways detailed in the paragraph above. However, beyond that, this website is a pedagogical excercise for DAQ members to teach: good software engineering practices, web development skills and system interoperability. To promote good software engineering practices, this project has a large suite of design documents relative to its size. To promote web development skills, Next.js (React.js based) and Express.js are used as industry mainstays that are not too far abstracted from the HTML that is ultimately rendered to the browsers. Flask is used for the supporting python microservices to further demonstrate the power of a RESTful API, and system interoperability. To further promote that final point, it is the eventual goal to implement the python microservices and C++ data receiver server into Docker containers, potentially connected together with kubernetes.
 
 ## 1. Data Visualization
 

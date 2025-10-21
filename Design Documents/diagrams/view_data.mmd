@@ -1,0 +1,24 @@
+---
+title: View Data 
+---
+
+sequenceDiagram
+    box UserSystem
+        participant U as DAQ_Member
+        participant S as System
+    end
+
+    box Database
+        participant FS as MongoDB
+    end
+
+    activate FS
+    activate S
+    U->>S: selectDataModel(data_model_name)
+    S->>FS: searchDataModel(data_model_name)
+    FS-->>S: data_model
+    deactivate FS
+    S-->>U: data_model
+    U->>S: viewData(data_model, view_settings)
+    S-->>U: graph data
+    deactivate S

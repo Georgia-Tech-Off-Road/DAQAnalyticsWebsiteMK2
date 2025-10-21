@@ -1,30 +1,4 @@
-# Upload Data
-```mermaid
-sequenceDiagram
-    box UserSystem
-        participant U as DAQ_Member
-        participant S as System
-    end
-
-    box FileSystem
-        participant FS as File System
-    end
-
-activate S
-U->>S: uploadData(file_name.json)
-activate FS
-S->>FS: createFolder(file_name)
-S->>FS: uploadFile(file_name_raw.json)
-U->>S: validateData(validation_settings)
-S-->>U: validation_result
-U->>S: processData(processing_settings)
-loop resolution layers
-    S->>FS: uploadFile(file_name_resolution.json)
-end
-deactivate FS
-S-->>U: postProcessSuceeded
-deactivate S
-```
+!["Upload Data Sequence Diagram"](../../diagrams/generated/upload_data.png "Upload Data Sequence Diagram")
 
 # Explanation
 

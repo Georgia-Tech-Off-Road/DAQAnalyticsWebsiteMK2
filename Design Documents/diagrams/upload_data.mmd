@@ -5,7 +5,7 @@ sequenceDiagram
     end
 
     box FileSystem
-        participant FS as File System
+        participant FS as Database
     end
 
 activate S
@@ -22,4 +22,3 @@ end
 deactivate FS
 S-->>U: postProcessSuceeded
 deactivate S
-

@@ -1,0 +1,1 @@
+![Class Diagram](../diagrams/generated/class_diagrams.png "Class Diagram")

@@ -8,9 +8,14 @@ Welcome to the repo for our data analytics and visualization website! You can re
 As you can see, I'm a big fan of Mozilla, one of the first places I look for resources on web development.
 
 ## Frontend:
-HTML Guide: https://developer.mozilla.org/en-US/docs/Web/HTML/Guides/Cheatsheet
-CSS Guide: https://developer.mozilla.org/en-US/docs/Learn_web_development/Getting_started/Your_first_website/Styling_the_content
-JavaScript: https://developer.mozilla.org/en-US/curriculum/core/javascript-fundamentals/#network_requests_with_fetch (If you have programming experience you will know pretty much every until section 6.9. 6.9-6.13 are the most useful for learning web development techniques)
+HTML Guide: https://developer.mozilla.org/en-US/docs/Web/HTML/Guides/Cheatsheet  
+
+CSS Guide: https://developer.mozilla.org/en-US/docs/Learn_web_development/Getting_started/Your_first_website/Styling_the_content  
+
+JavaScript: https://developer.mozilla.org/en-US/curriculum/core/javascript-fundamentals/#network_requests_with_fetch (If you have programming experience you will know pretty much every until section 6.9. 6.9-6.13 are the most useful for learning web development techniques)  
+
 ## Backend:
-Express.js: https://expressjs.com/en/guide/routing.html
-MVC Architecture: https://developer.mozilla.org/en-US/docs/Glossary/MVC
+Express.js: https://expressjs.com/en/guide/routing.html  
+
+MVC Architecture: https://developer.mozilla.org/en-US/docs/Glossary/MVC  
+

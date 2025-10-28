@@ -4,6 +4,9 @@ const app = express()
 const hostname = '127.0.0.1'
 const port = 3000
 
+
+app.use(require('cors')())
+
 app.get('/', (req, res) => {
 	res.send('Goodbye!');
 })

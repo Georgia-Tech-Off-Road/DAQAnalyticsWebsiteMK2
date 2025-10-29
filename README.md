@@ -19,3 +19,5 @@ Express.js: https://expressjs.com/en/guide/routing.html
 
 MVC Architecture: https://developer.mozilla.org/en-US/docs/Glossary/MVC  
 
+## Database
+[https://www.prisma.io/dataguide/datamodeling/tables-tuples-types](https://www.prisma.io/dataguide/datamodeling/tables-tuples-types)

@@ -10,8 +10,9 @@ DAQ already has a robust collection of python functions for data processing impl
 # Data Receiver Server
 This server will be built in C++ as that is the language of the [CMBTL](https://github.com/Georgia-Tech-Off-Road/CommboardTransmissionLibrary) library. Its purpose is to receive data from the vehicle, decode it, and then transmit it to our backend.
 
-# Database
-The database will be a MongoDB database in order to effectively store the JSON files (SQL databases would be more cumbersome to do this). 
+
+# Filesystem
+We wil store our data locally (including resolutions, modifications, etc.) locally in our local server filesystem. Metadata for the files will be stored locally initially, but the plan is to migrate metadata to an sqlite server in the long run.
 
 # Onboard DAQ
 It the responsability of our onboard DAQ system to maintain current sensor state, coordinate with and send data to the Data Receiver Server.

@@ -1,4 +1,4 @@
-import { useState,useEffect } from 'react'
+import { useState,useEffect,useRef } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
@@ -7,29 +7,49 @@ function App() {
   const [count, setCount] = useState(0)
   const [fileData, setFileData] = useState(null)
   const [loading, setLoading] = useState(false)
+  const fileInputRef = useRef()
+
   useEffect(() => {
     loadFileNames()
   }, []);
 
   return (
     <>
+      
       <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <form onSubmit={async (e) => {
+          e.preventDefault()
+          const files = fileInputRef.current.files
+          if (!files || files.length === 0) {
+            setFileData('Please select a file')
+            return
+          }
+          const fd = new FormData()
+          fd.append('file', files[0]) // field name must match upload.single('file')
+          setLoading(true)
+          try {
+            const res = await fetch('http://127.0.0.1:3000/upload', { method: 'POST', body: fd })
+            if (!res.ok) throw new Error('Upload failed: ' + res.status)
+            const json = await res.json()
+            setFileData('Upload success: ' + JSON.stringify(json))
+            // optionally refresh file list here
+            loadFileNames()
+          } catch (err) {
+            setFileData('Upload error: ' + err.message)
+          } finally {
+            setLoading(false)
+            alert("File finish uploading")
+            loadFileNames()
+          }
+        }}>
+          <label htmlFor="myFile">Choose File:</label>
+          <input ref={fileInputRef} type="file" id="myFile" name="file" accept=".txt,.json" />
+          <button class="logo" type="submit">Upload</button>
+        </form>
       </div>
-      <h1>Vite + React</h1>
+
+
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-        
         <label for="fileDisplay">Select a file to display:</label>
           <select id="fileDisplay" name="fileDisplay">
             <option value = "" disabled selected>Select a file</option>
@@ -56,13 +76,54 @@ function App() {
             setLoading(false)
           }
         }}>
-          display file
+          Display file
         </button>
        
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+
+      <div>
+        <label for="fileDownload">Select a file to downlaod:</label>
+          <select id="fileDownload" name="fileDownloadS">
+            <option value = "" disabled selected>Select a file</option>
+          </select>
+
+          <button onClick={async () => {
+            const dropdown = document.getElementById("fileDownload")
+            const fileName = dropdown.value
+            if (!fileName) {
+                setFileData('Please select a file to download')
+                return
+            }
+            
+            setLoading(true)
+            try {
+                // Call backend directly. Backend listens on 127.0.0.1:3000
+                const res = await fetch(getSelectedDLValue())
+                if (!res.ok) throw new Error('Download failed: ' + res.status)
+                
+                // Get the blob from the response
+                const blob = await res.blob()
+                
+                // Create a temporary link and trigger download
+                const url = window.URL.createObjectURL(blob)
+                const a = document.createElement('a')
+                a.href = url
+                a.download = fileName  // Suggest filename to save as
+                document.body.appendChild(a)
+                a.click()
+                
+                // Cleanup
+                window.URL.revokeObjectURL(url)
+                document.body.removeChild(a)
+            } catch (err) {
+                setFileData('Error downloading file: ' + err.message)
+            } finally {
+                setLoading(false)
+            }
+          }}>
+            Download file
+          </button>
+      </div>
     </>
   )
 
@@ -70,7 +131,7 @@ function App() {
     const selectElement = document.getElementById(selectId);
 
     while (selectElement.children.length > 1) {
-      selectElement.removeChild(selectElement.lastchild)
+      selectElement.removeChild(selectElement.lastChild)
     }
 
     fileArray.forEach(item => {
@@ -91,6 +152,15 @@ function App() {
     return result
   }
 
+  function getSelectedDLValue() {
+    const dropdown = document.getElementById("fileDownload");
+    const selectedValue = dropdown.value;
+    
+    const result = 'http://127.0.0.1:3000/download/' + selectedValue
+    console.log(result)
+    return result
+  }
+
   async function loadFileNames() {
     
     try {
@@ -101,6 +171,7 @@ function App() {
       const files = await res.json()
 
       populateSelect('fileDisplay', files)
+      populateSelect('fileDownload', files)
     } catch (err) {
       console.error('Error:', err)
       setFileData('Error loading files: ' + err.message)

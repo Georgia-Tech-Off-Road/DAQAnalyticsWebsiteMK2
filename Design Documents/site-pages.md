@@ -24,20 +24,6 @@ Page that allows the authorized users to upload new data sets.
 # Manage Data
 Page that allows authorized users to modify or delete existings data sets. Modifying data sets would include changing the processing stack used to process the raw data.
 
-
-
-```mermaid
-flowchart LR
-    Home["Home Page"]
-    ManageData["Manage Data"]
-    UploadData["Upload Data"]
-    ViewData["View Data"]
-    Home --> ViewData
-    Home --> ManageData
-    Home --> UploadData
-    ViewData --> Home
-    ManageData --> Home
-    UploadData --> Home
-```
+!["Site Pages"](./diagrams/generated/site-pages.png)
 **Note:** Log in / Sign up / Logout pages are accesible from all pages.
 

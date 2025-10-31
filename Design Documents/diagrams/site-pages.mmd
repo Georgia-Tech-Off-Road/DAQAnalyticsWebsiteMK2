@@ -1,0 +1,11 @@
+flowchart LR
+    Home["Home Page"]
+    ManageData["Manage Data"]
+    UploadData["Upload Data"]
+    ViewData["View Data"]
+    Home --> ViewData
+    Home --> ManageData
+    Home --> UploadData
+    ViewData --> Home
+    ManageData --> Home
+    UploadData --> Home

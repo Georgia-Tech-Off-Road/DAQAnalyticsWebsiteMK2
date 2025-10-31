@@ -5,6 +5,20 @@
   text-align: center;
 }
 
+#fileDisplay {
+    border: 2px solid blue;
+    padding: 5px;
+    background-color: #f0f0f0;
+    font-size: 16px;
+}
+
+#fileDownload {
+    border: 2px solid blue;
+    padding: 5px;
+    background-color: #f0f0f0;
+    font-size: 16px;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;

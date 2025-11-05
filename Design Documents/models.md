@@ -8,7 +8,6 @@ Dataset contains metadata on our dataset and references to the actual data. Our 
 ```
 id: TEXT # Unique identifier for the dataset
 title: TEXT # Human readable title of the dataset
-folder_path: TEXT # Location to folder where actual dataset data is contained
 description: TEXT # Description of the dataset, notes on collection, etc.
 date: TEXT # Date of recording
 location_id: FOREIGN_KEY # Links to a Location

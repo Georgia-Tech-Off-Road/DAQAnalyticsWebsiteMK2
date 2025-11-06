@@ -23,8 +23,8 @@ router.post("/", (req, res) => {
     try {
         // Get a randomized cryptographic ID (very low chance of ID collision)
         const id = crypto.randomUUID();
-        // Get current datetime in ISO format
-        const now = new Date().toISOString();
+        // Get current datetime in SQLite format (YYYY-MM-DD HH:MM:SS)
+        const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
         const stmt = db.prepare(`
             INSERT INTO Dataset (id, title, 
                 description, date, uploaded_at, updated_at, location_id, competition)
@@ -47,3 +47,5 @@ router.post("/", (req, res) => {
         res.status(500).json( {error: err.message })
     }
 })
+
+module.exports = router;

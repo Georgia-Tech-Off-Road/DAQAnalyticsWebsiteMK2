@@ -1,5 +1,5 @@
 const Database = require("better-sqlite3")
-const path = requite("path")
+const path = require("path")
 const fs = require("fs")
 
 const db = new Database(path.join(__dirname, "data.db"));
@@ -12,8 +12,8 @@ const schemaPath = path.join(__dirname, "schema.sql")
 // Check if schemaPath exists
 if (fs.existsSync(schemaPath)) {
     // Read schema statement from schema.sql
-    const schema = fs.readFileSync(schemaPath)
+    const schema = fs.readFileSync(schemaPath).toString()
     db.exec(schema)
 }
 
-module.exports =  { db }
+module.exports = db

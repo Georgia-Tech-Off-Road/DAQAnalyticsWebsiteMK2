@@ -5,14 +5,25 @@ const hostname = '127.0.0.1'
 const port = 3000
 const microservices_hostname = "http://127.0.0.1:5000"
 const path = require('node:path')
+const cors = require('cors')
 const multer = require('multer')
+
+// Import routers
+const datasets = require('./routes/datasets')
+
+// Define middleware first
+app.use(cors())
+app.use(express.json())
+
+// Now define routes
+app.use("/datasets", datasets)
+
 
 const uploadDir = path.join(__dirname, 'DAQFiles')
 if (!fs.existsSync(uploadDir)) {
 	fs.mkdirSync(uploadDir, { recursive: true })
 }
 
-app.use(require('cors')())
 
 const storage = multer.diskStorage({
 	destination: function (req, file, cb) {

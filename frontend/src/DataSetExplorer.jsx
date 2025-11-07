@@ -19,7 +19,7 @@ function DataSetExplorer() {
     return (
         <>
             { alertMessage }
-            { datasets.map((dataset) => {return (<DataSetAccess title={dataset} date="11-03-2025"/>)}) }
+            <DataSetAccess title="My Dataset 1" date="11-03-2025"/>
         </>
     )
 

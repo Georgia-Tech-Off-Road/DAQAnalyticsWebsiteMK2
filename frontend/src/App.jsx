@@ -15,7 +15,7 @@ function App() {
 
   return (
     <>
-      
+      <a href="/uploadfile"> Upload Page </a>
       <div>
         <form onSubmit={async (e) => {
           e.preventDefault()

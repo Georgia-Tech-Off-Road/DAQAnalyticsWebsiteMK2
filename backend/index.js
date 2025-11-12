@@ -6,7 +6,7 @@ const port = 3000
 const microservices_hostname = "http://127.0.0.1:5000"
 const path = require('node:path')
 const cors = require('cors')
-const multer = require('multer')
+
 
 // Import routers
 const datasets = require('./routes/datasets')
@@ -19,25 +19,9 @@ app.use(express.json())
 app.use("/datasets", datasets)
 
 
-const uploadDir = path.join(__dirname, 'DAQFiles')
-if (!fs.existsSync(uploadDir)) {
-	fs.mkdirSync(uploadDir, { recursive: true })
-}
 
 
-const storage = multer.diskStorage({
-	destination: function (req, file, cb) {
-		cb(null, uploadDir)
-	},
-	filename: function (req, file, cb) {
-		// Create a safe filename: timestamp + original name with unsafe chars replaced
-		const safeName = Date.now() + '-' + file.originalname.replace(/[^a-zA-Z0-9.\-_]/g, '_')
-		cb(null, safeName)
-	}
-})
 
-// multer upload instance (no file type or size limits)
-const upload = multer({ storage })
 
 app.get('/', (req, res) => {
 	res.send('Goodbye!');
@@ -101,20 +85,6 @@ app.get('/listFiles/', (req, res) => {
 		res.send(files)
 		
 	})
-})
-
-app.post('/upload', upload.single('file'), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: 'No file uploaded' })
-  }
-
-  // req.file contains info about the saved file
-  // Example response: saved filename and original name
-  res.json({
-    filename: req.file.filename,
-    originalName: req.file.originalname,
-    size: req.file.size
-  })
 })
 
 app.get('/download/:fileName', (req, res) => {

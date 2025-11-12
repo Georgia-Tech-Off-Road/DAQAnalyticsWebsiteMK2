@@ -1,6 +1,5 @@
 import { useState,useEffect,useRef } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+
 import './App.css'
 
 function App() {
@@ -15,44 +14,14 @@ function App() {
 
   return (
     <>
+      <a href="/UploadFile"> Upload Page </a>
       
-      <div>
-        <form onSubmit={async (e) => {
-          e.preventDefault()
-          const files = fileInputRef.current.files
-          if (!files || files.length === 0) {
-            setFileData('Please select a file')
-            return
-          }
-          const fd = new FormData()
-          fd.append('file', files[0]) // field name must match upload.single('file')
-          setLoading(true)
-          try {
-            const res = await fetch('http://127.0.0.1:3000/upload', { method: 'POST', body: fd })
-            if (!res.ok) throw new Error('Upload failed: ' + res.status)
-            const json = await res.json()
-            setFileData('Upload success: ' + JSON.stringify(json))
-            // optionally refresh file list here
-            loadFileNames()
-          } catch (err) {
-            setFileData('Upload error: ' + err.message)
-          } finally {
-            setLoading(false)
-            alert("File finish uploading")
-            loadFileNames()
-          }
-        }}>
-          <label htmlFor="myFile">Choose File:</label>
-          <input ref={fileInputRef} type="file" id="myFile" name="file" accept=".txt,.json" />
-          <button class="logo" type="submit">Upload</button>
-        </form>
-      </div>
 
 
       <div className="card">
-        <label for="fileDisplay">Select a file to display:</label>
-          <select id="fileDisplay" name="fileDisplay">
-            <option value = "" disabled selected>Select a file</option>
+        <label htmlFor="fileDisplay">Select a file to display:</label>
+          <select id="fileDisplay" name="fileDisplay" defaultValue="">
+            <option value="" disabled>Select a file</option>
           </select>
 
 
@@ -82,9 +51,9 @@ function App() {
       </div>
 
       <div>
-        <label for="fileDownload">Select a file to downlaod:</label>
-          <select id="fileDownload" name="fileDownloadS">
-            <option value = "" disabled selected>Select a file</option>
+        <label htmlFor="fileDownload">Select a file to downlaod:</label>
+          <select id="fileDownload" name="fileDownloadS" defaultValue="">
+            <option value="" disabled>Select a file</option>
           </select>
 
           <button onClick={async () => {

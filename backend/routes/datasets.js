@@ -1,7 +1,31 @@
 const express = require("express")
 const router = express.Router()
+const fs = require('node:fs')
 const db = require("../database/db")
 const crypto = require('crypto')
+const path = require('node:path')
+const cors = require('cors')
+const multer = require('multer')
+
+const uploadDir = path.join(__dirname, 'DAQFiles')
+if (!fs.existsSync(uploadDir)) {
+	fs.mkdirSync(uploadDir, { recursive: true })
+}
+
+const storage = multer.diskStorage({
+	destination: function (req, file, cb) {
+		cb(null, uploadDir)
+	},
+	filename: function (req, file, cb) {
+		// Create a safe filename: timestamp + original name with unsafe chars replaced
+		const safeName = Date.now() + '-' + file.originalname.replace(/[^a-zA-Z0-9.\-_]/g, '_')
+		cb(null, safeName)
+	}
+})
+
+
+const upload = multer({ storage })
+
 
 router.get("/", (req, res) => {
     const stmt = db.prepare("SELECT * FROM Dataset")
@@ -46,6 +70,20 @@ router.post("/", (req, res) => {
         console.log(`Error creating dataset: ${err}`)
         res.status(500).json( {error: err.message })
     }
+})
+
+router.post('/upload', upload.single('file'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'No file uploaded' })
+  }
+
+  // req.file contains info about the saved file
+  // Example response: saved filename and original name
+  res.json({
+    filename: req.file.filename,
+    originalName: req.file.originalname,
+    size: req.file.size
+  })
 })
 
 module.exports = router;

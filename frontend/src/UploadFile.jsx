@@ -39,7 +39,7 @@ function UploadPage() {
                     ← Home
                 </button>
                 <h1 style={{ margin: 0, fontSize: '24px', position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
-                    Dataset Upload System
+                    Upload a Dataset
                 </h1>
                 <div></div>
             </header>

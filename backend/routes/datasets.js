@@ -91,14 +91,25 @@ router.post('/upload', upload.single('file'), (req, res) => {
         // Get current datetime in SQLite format (YYYY-MM-DD HH:MM:SS)
         const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
-        // Convert date from YYYY-MM-DD to YYYY-MM-DD HH:MM:SS format
-        const formattedDate = date.includes(':') ? date : `${date} 00:00:00`;
+        // Convert date to SQLite format (YYYY-MM-DD HH:MM:SS)
+        // Handles both "YYYY-MM-DD" and "YYYY-MM-DDTHH:MM" formats
+        let formattedDate;
+        if (date.includes('T')) {
+            // datetime-local format: "2025-11-11T13:50"
+            formattedDate = date.replace('T', ' ') + ':00';
+        } else if (date.includes(':')) {
+            // Already in correct format
+            formattedDate = date;
+        } else {
+            // Date only: "2025-11-11"
+            formattedDate = `${date} 00:00:00`;
+        }
 
         const stmt = db.prepare(`
-            INSERT INTO Dataset (id, title, 
-                description, date, uploaded_at, updated_at, location_id, competition)
-            VALUES (@id, @title, @description, @date, @uploaded_at, 
-                @updated_at, @location_id, @competition)`)
+            INSERT INTO Dataset (id, title,
+                    description, date, uploaded_at, updated_at, location_id, competition)
+            VALUES (@id, @title, @description, @date, @uploaded_at,
+                    @updated_at, @location_id, @competition)`)
         stmt.run({
             id: id,
             title: title,

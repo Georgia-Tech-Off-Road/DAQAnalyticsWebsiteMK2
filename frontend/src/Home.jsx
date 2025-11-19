@@ -8,12 +8,13 @@ function Home() {
     } */
     let [counter, setCounter] = useState(1)
     let [dropStatus, setStatus] = useState(false)
-    let [practice_counter, practicesetCounter] = useState(1)
-    let [practice_status, practicesetStatus] = useState(false)
+    // let [practice_counter, practicesetCounter] = useState(1)
+    // let [practice_status, practicesetStatus] = useState(false)
     return (
         <>
-            <a href="/UploadFile"> Upload Page </a>
-            <a href="/Vehicle"> Vehicle Page </a>
+            <a href="/UploadFile"> File Upload Page </a>
+            <a href="/UploadVehicle"> Vehicle Upload Page </a>
+            <a href="/ViewVehicles"> Vehicle View Page </a>
 
             <h1> Welcome to the Home Page! </h1>
             <img src = "https://gtor.gatech.edu/img/gtor-logo.jpg" alt = "GTOR logo" width="350"/>

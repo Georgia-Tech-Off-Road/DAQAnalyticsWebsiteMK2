@@ -52,9 +52,9 @@ router.post("/", (req, res) => {
         const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
         const stmt = db.prepare(`
             INSERT INTO Dataset (id, title,
-                                 description, date, uploaded_at, updated_at, location_id, competition)
+                                 description, date, uploaded_at, updated_at, location_id, vehicle_id, competition)
             VALUES (@id, @title, @description, @date, @uploaded_at,
-                    @updated_at, @location_id, @competition)`)
+                    @updated_at, @location_id, @vehicle_id, @competition)`)
         stmt.run({
             id: id,
             title: title,
@@ -63,6 +63,7 @@ router.post("/", (req, res) => {
             uploaded_at: now,
             updated_at: now,
             location_id: location_id || null,
+            vehicle_id: vehicle_id || null,
             competition: competition ? 1 : 0,
         });
         res.status(201).json({ id })
@@ -80,7 +81,7 @@ router.post('/upload', upload.single('file'), (req, res) => {
     if (!req.file) {
         return res.status(400).json({ error: 'No file uploaded' })
     }
-    const { title, description, date, location_id, competition } = req.body;
+    const { title, description, date, location_id, vehicle_id, competition } = req.body;
 
     if (!title || !date) {
         return res.status(400).json({ error: "Missing required fields"});
@@ -107,9 +108,9 @@ router.post('/upload', upload.single('file'), (req, res) => {
 
         const stmt = db.prepare(`
             INSERT INTO Dataset (id, title,
-                    description, date, uploaded_at, updated_at, location_id, competition)
+                    description, date, uploaded_at, updated_at, location_id, vehicle_id, competition)
             VALUES (@id, @title, @description, @date, @uploaded_at,
-                    @updated_at, @location_id, @competition)`)
+                    @updated_at, @location_id, @vehicle_id, @competition)`)
         stmt.run({
             id: id,
             title: title,
@@ -118,6 +119,7 @@ router.post('/upload', upload.single('file'), (req, res) => {
             uploaded_at: now,
             updated_at: now,
             location_id: location_id || null,
+            vehicle_id: vehicle_id || null,
             competition: competition ? 1 : 0,
         });
 

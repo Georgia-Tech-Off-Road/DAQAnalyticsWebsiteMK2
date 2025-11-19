@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import './UploadFile.css'
 
 function UploadPage() {
@@ -7,6 +7,15 @@ function UploadPage() {
     const buttonRef = useRef(null);
     const [fileData, setFileData] = useState(null)
     const [loading, setLoading] = useState(false)
+    const [vehicles, setVehicles] = useState([])
+
+    // Fetch vehicles when component loads
+    useEffect(() => {
+        fetch('http://127.0.0.1:3000/vehicles')
+            .then(res => res.json())
+            .then(data => setVehicles(data))
+            .catch(err => console.error('Error fetching vehicles:', err))
+    }, [])
 
     return (
         <div>
@@ -122,6 +131,20 @@ function UploadPage() {
                             <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
                                 <label htmlFor="myLocation" style={{ width: '200px' }}>Location ID:</label>
                                 <input type="text" id="myLocation" name="location_id" style={{ width: '200px', padding: '5px', fontSize: '14px' }} placeholder={"e.g. Iron Mountain"}/>
+                            </div>
+
+                            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                                <label htmlFor="vehicleSelect" style={{ width: '200px' }}>
+                                    Vehicle:
+                                </label>
+                                <select id="vehicleSelect" name="vehicle_id" style={{ width: '200px', padding: '5px', fontSize: '14px' }}>
+                                    <option value="">Select a vehicle...</option>
+                                    {vehicles.map(vehicle => (
+                                        <option key={vehicle.id} value={vehicle.id}>
+                                            {vehicle.title}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
 
                             <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>

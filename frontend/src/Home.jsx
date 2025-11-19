@@ -12,6 +12,9 @@ function Home() {
     let [practice_status, practicesetStatus] = useState(false)
     return (
         <>
+            <a href="/UploadFile"> Upload Page </a>
+            <a href="/Vehicle"> Vehicle Page </a>
+
             <h1> Welcome to the Home Page! </h1>
             <img src = "https://gtor.gatech.edu/img/gtor-logo.jpg" alt = "GTOR logo" width="350"/>
             <p> Have a donut, learn a little, stay a while! </p>

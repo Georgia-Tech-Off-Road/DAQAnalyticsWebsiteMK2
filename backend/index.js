@@ -10,6 +10,7 @@ const cors = require('cors')
 
 // Import routers
 const datasets = require('./routes/datasets')
+const vehicles = require('./routes/vehicles')
 
 // Define middleware first
 app.use(cors())
@@ -17,6 +18,7 @@ app.use(express.json())
 
 // Now define routes
 app.use("/datasets", datasets)
+app.use("/vehicles", vehicles)
 
 
 

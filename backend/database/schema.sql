@@ -19,6 +19,14 @@ CREATE TABLE IF NOT EXISTS Dataset (
     competition INTEGER CHECK(competition IN (0, 1)) -- Make sure competition is a bool (0 = false, 1 = true)
 );
 
+CREATE TABLE IF NOT EXISTS Vehicle (
+    id TEXT PRIMARY KEY,
+    title TEXT NOT NULL,
+    description TEXT,
+    uploaded_at TEXT NOT NULL CHECK(uploaded_at IS datetime(uploaded_at, 'auto')),
+    updated_at TEXT NOT NULL CHECK(updated_at IS datetime(updated_at, 'auto'))
+);
+
 -- Create Indexes
 CREATE INDEX IF NOT EXISTS idx_location_parent ON Location(parent_id);
 CREATE INDEX IF NOT EXISTS idx_dataset_location ON Dataset(location_id);

@@ -16,6 +16,51 @@ function Home() {
             <a href="/UploadVehicle"> Vehicle Upload Page </a>
             <a href="/ViewVehicles"> Vehicle View Page </a>
 
+            <button onClick={async () => {
+                const hardcodedFilePath = 'C:/Users/colin/Documents/GTOR/GTOR-DAQ/Data Files/2025-10-18 13_31_29.txt'
+
+                try {
+                    const res = await fetch('http://127.0.0.1:3000/toCSV', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ filePath: hardcodedFilePath })
+                    })
+
+                    if (res.ok) {
+                        const contentDisposition = res.headers.get('content-disposition')
+                        let filename = 'download.csv'
+                        if (contentDisposition) {
+                            const filnameMatch = contentDisposition.match(/filename=?(.+)"?/)
+                            if (filenameMatch) {
+                                filename = filenameMatch[1]
+                            }
+                        }
+
+                        const blob = await res.blob()
+                        const url = window.URL.createObjectURL(blob)
+                        const a = document.createElement('a')
+                        a.href = url
+                        a.download = filename
+                        document.body.appendChild(a)
+                        a.click()
+                        window.URL.revokeObjectURL(url)
+                        document.body.removeChild(a)
+
+                        alert('CSV file downloaded successfully!')
+                    } else {
+                        alert('Error creating CSV file')
+                    }
+
+                } catch (error) {
+                    console.error('Error:', error)
+                    alert('Network error')
+                }
+                
+            }}> convert file to CSV
+            </button>
+
             <h1> Welcome to the Home Page! </h1>
             <img src = "https://gtor.gatech.edu/img/gtor-logo.jpg" alt = "GTOR logo" width="350"/>
             <p> Have a donut, learn a little, stay a while! </p>

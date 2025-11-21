@@ -12,6 +12,7 @@ app.use(express.urlencoded({ extended: true }))
 
 // Import routers
 const datasets = require('./routes/datasets')
+const pythonServices = require('./routes/pythonServices')
 const vehicles = require('./routes/vehicles')
 
 // Define middleware first
@@ -21,6 +22,7 @@ app.use(express.json())
 // Now define routes
 app.use("/datasets", datasets)
 app.use("/vehicles", vehicles)
+app.use("/pythonServices", pythonServices)
 
 
 app.get('/', (req, res) => {

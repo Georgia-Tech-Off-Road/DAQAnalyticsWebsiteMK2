@@ -67,10 +67,11 @@ app.get("/test-microservices", (req, res) => {
 	})
 })
 
-
-app.listen(port, hostname, () => {
+if (require.main === module) {
+	app.listen(port, hostname, () => {
 	console.log(`App listenting on ${hostname}:${port}`);
-});
+	});
+}
 
 app.get('/listFiles/', (req, res) => {
 	const directoryPath = './DAQFiles'
@@ -108,4 +109,5 @@ app.get('/download/:fileName', (req, res) => {
     })
 })
 
+module.exports = app;
 

@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS Location (
     id TEXT PRIMARY KEY,
     title TEXT NOT NULL,
     description TEXT NOT NULL,
-    competition INTEGER CHECK(competition IN (0, 1)),
+    competition INTEGER CHECK(competition IN (0, 1)) NOT NULL,
     created_at TEXT NOT NULL CHECK(created_at IS datetime(created_at, 'auto')),
     updated_at TEXT NOT NULL CHECK(updated_at IS datetime(updated_at, 'auto')),
     latitude REAL NOT NULL,

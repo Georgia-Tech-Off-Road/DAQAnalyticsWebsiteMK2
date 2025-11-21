@@ -12,10 +12,10 @@ router.use(cors())
 router.get('/', (req, res) => {
     try {
         const stmt = db.prepare(`SELECT * FROM Location`)
-        const locations = stmt.all()
+            const locations = stmt.all()
         res.json({locations: locations})
     } catch (err) {
-        console.log(`Error when fetching vehicles: ${err}`)
+        console.log(`Error when fetching locations: ${err}`)
         res.status(500).json({error: err.message})
     }
 })
@@ -68,14 +68,14 @@ router.post('/', (req, res) => {
             updated_at: now,
             latitude: latitude,
             longitude: longitude,
-            parent_id: null
+            parent_id: parent_id
         })
 
         console.log(`Location succesfully created with ID: ${id}`)
-        res.status(201).json({id: id})
+        return res.status(201).json({id: id})
     } catch (err) {
         console.log(`Error when creating location: ${err}`)
-        res.status(500).json({error: err.message})
+        return res.status(500).json({error: err.message})
     }
 })
 

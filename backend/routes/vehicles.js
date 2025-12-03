@@ -6,7 +6,7 @@ const cors = require('cors')
 
 router.use(cors())
 
-router.post('/upload', (req, res) => {
+router.post('/', (req, res) => {
     console.log('Upload request received:', req.body)
 
     const { title, description } = req.body;

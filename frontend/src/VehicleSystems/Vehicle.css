@@ -1,0 +1,18 @@
+.logo {
+    height: 6em;
+    padding: 1.5em;
+    background-color: deepskyblue !important;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: filter 300ms;
+}
+
+.logo:hover {
+    background-color: blue !important;
+}
+
+.logo:disabled {
+    background-color: gray !important;
+    cursor: not-allowed;
+}

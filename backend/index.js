@@ -7,9 +7,12 @@ const microservices_hostname = "http://127.0.0.1:5000"
 const path = require('node:path')
 const cors = require('cors')
 
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 
 // Import routers
 const datasets = require('./routes/datasets')
+const vehicles = require('./routes/vehicles')
 
 // Define middleware first
 app.use(cors())
@@ -17,10 +20,7 @@ app.use(express.json())
 
 // Now define routes
 app.use("/datasets", datasets)
-
-
-
-
+app.use("/vehicles", vehicles)
 
 
 app.get('/', (req, res) => {

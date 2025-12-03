@@ -16,7 +16,7 @@ function App() {
       <>
           <a href="/UploadFile"> Upload Page </a>
 
-          <a href="/Vehicle"> Upload Page </a>
+          <a href="/frontend/src/VehicleSystems/UploadVehicle"> Upload Page </a>
 
           <div className="card">
               <label htmlFor="fileDisplay">Select a file to display:</label>

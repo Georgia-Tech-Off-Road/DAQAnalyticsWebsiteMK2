@@ -7,6 +7,8 @@ const microservices_hostname = "http://127.0.0.1:5000"
 const path = require('node:path')
 const cors = require('cors')
 
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 
 // Import routers
 const datasets = require('./routes/datasets')

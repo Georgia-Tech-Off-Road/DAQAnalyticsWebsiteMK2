@@ -13,6 +13,7 @@ app.use(express.urlencoded({ extended: true }))
 // Import routers
 const datasets = require('./routes/datasets')
 const vehicles = require('./routes/vehicles')
+const locations = require('./routes/locations')
 
 // Define middleware first
 app.use(cors())
@@ -21,6 +22,7 @@ app.use(express.json())
 // Now define routes
 app.use("/datasets", datasets)
 app.use("/vehicles", vehicles)
+app.use("/locations", locations)
 
 
 app.get('/', (req, res) => {
@@ -67,10 +69,11 @@ app.get("/test-microservices", (req, res) => {
 	})
 })
 
-
-app.listen(port, hostname, () => {
+if (require.main === module) {
+	app.listen(port, hostname, () => {
 	console.log(`App listenting on ${hostname}:${port}`);
-});
+	});
+}
 
 app.get('/listFiles/', (req, res) => {
 	const directoryPath = './DAQFiles'
@@ -108,4 +111,5 @@ app.get('/download/:fileName', (req, res) => {
     })
 })
 
+module.exports = app;
 

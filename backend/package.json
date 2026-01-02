@@ -4,14 +4,15 @@
   "description": "Backend service for the DAQAnalytics website",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "test": "jest --verbose --coverage"
+    "start": "node --env-file=.prod.env index.js",
+    "test": "python database/manage.py refresh database/migrations/ database/test.db && cross-env DATABASE_PATH=database/test.db jest --verbose --coverage"
   },
   "author": "Georgia Tech Offroad Data Analytics Subteam",
   "license": "MIT",
   "dependencies": {
     "better-sqlite3": "^12.4.1",
     "cors": "^2.8.5",
+    "cross-env": "^10.1.0",
     "express": "^5.1.0",
     "joi": "^18.0.1",
     "multer": "^2.0.2"

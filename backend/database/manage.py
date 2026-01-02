@@ -1,24 +1,29 @@
 import argparse
 import sqlite3
 import sys
-from os import listdir
+from os import listdir, remove
 from os.path import isfile, join
 import glob
 from pathlib import Path
 
 cmd_help_msg = """Command that you would like to run:  
 
-    migrate: run migrations on [database]"""
+    migrate: run migrations on [database]
+    refresh: delete [datbase] then start from scratch with [migrations]"""
 database_help_msg = """Path to your .db sqlite3 file"""
 migrations_path_help_msg = """Path to a folder containing your .sql migration files"""
 
 
-def parse_command(command, migrations_path, cursor):
+def parse_command(command, migrations_path, database_path):
     if command == "migrate":
+        cursor = init_database_connection(database_path)
+        migrate(cursor,migrations_path)
+    elif command == "refresh":
+        remove(database_path)
+        cursor = init_database_connection(database_path)
         migrate(cursor,migrations_path)
     else:
         raise Exception("Unknown command")
-    
 def init_database_connection(database_path):
     conn = sqlite3.connect(database_path)
     cur = conn.cursor()
@@ -60,5 +65,4 @@ args = parser.parse_args()
 
 verbose = args.verbose
 database_path = args.database
-cursor = init_database_connection(args.database)
-parse_command(args.command, args.migrations, cursor)
+parse_command(args.command, args.migrations, database_path)

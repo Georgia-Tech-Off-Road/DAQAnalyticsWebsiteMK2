@@ -1,6 +1,6 @@
   const request = require('supertest');
   const app = require('../index');
-  const db = require('../database/test-db');
+  const db = require('../database/db.js');
 
   describe('Locations API', () => {
 

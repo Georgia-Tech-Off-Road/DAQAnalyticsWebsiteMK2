@@ -1,3 +1,4 @@
+BEGIN;
 CREATE TABLE IF NOT EXISTS Location (
     id TEXT PRIMARY KEY,
     title TEXT NOT NULL,
@@ -33,3 +34,5 @@ CREATE TABLE IF NOT EXISTS Vehicle (
 -- Create Indexes
 CREATE INDEX IF NOT EXISTS idx_location_parent ON Location(parent_id);
 CREATE INDEX IF NOT EXISTS idx_dataset_location ON Dataset(location_id);
+
+COMMIT;

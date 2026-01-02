@@ -19,7 +19,11 @@ def parse_command(command, migrations_path, database_path):
         cursor = init_database_connection(database_path)
         migrate(cursor,migrations_path)
     elif command == "refresh":
-        remove(database_path)
+        try:
+            remove(database_path)
+        # Don't worry if database_path DNE
+        except OSError:
+            pass
         cursor = init_database_connection(database_path)
         migrate(cursor,migrations_path)
     else:
@@ -36,7 +40,7 @@ def migrate(cursor, migrations_path):
     root_dir = Path(migrations_path)
     if not root_dir.is_dir():
         raise Exception(f"{root_dir} is not a valid directory!", file=sys.stderr)
-    files = root_dir.glob("*.sql", recurse_symlinks=False)
+    files = root_dir.glob("*.sql")
     files = sorted(files)
     if verbose:
         print("About to run the following migrations:")

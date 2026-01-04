@@ -1,6 +1,16 @@
 # Overview
 Backend folder for our data analytics website
 
+# Quickstart
+Create the development database and populate it with a couple values:
+
+``npm run init-dev``
+If you get an error after running the previous command, then you likely already have database at database/data.db.
+
+Start the server:
+
+``npm run start``
+
 # How To
 
 ## Running Python Microservices

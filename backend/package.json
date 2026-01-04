@@ -4,8 +4,9 @@
   "description": "Backend service for the DAQAnalytics website",
   "main": "index.js",
   "scripts": {
-    "start": "node --env-file=.prod.env index.js",
-    "test": "python database/manage.py refresh database/migrations/ database/test.db && cross-env DATABASE_PATH=database/test.db jest --verbose --coverage"
+    "start": "bash scripts/start.sh",
+    "init-dev": "bash scripts/init-dev.sh",
+    "test": "bash scripts/test.sh"
   },
   "author": "Georgia Tech Offroad Data Analytics Subteam",
   "license": "MIT",

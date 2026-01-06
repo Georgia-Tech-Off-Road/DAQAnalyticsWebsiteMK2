@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import './Vehicle.css'
-
+import { api } from '../api/backend.js'
 function VehicleView() {
     const [vehicles, setVehicles] = useState([])
     const [loading, setLoading] = useState(true)
@@ -14,11 +14,7 @@ function VehicleView() {
 
     const fetchVehicles = () => {
         setLoading(true)
-        fetch('http://127.0.0.1:3000/vehicles')
-            .then(res => {
-                if (!res.ok) throw new Error('Failed to fetch vehicles')
-                return res.json()
-            })
+        api.getVehicles()
             .then(data => {
                 setVehicles(data)
                 setLoading(false)

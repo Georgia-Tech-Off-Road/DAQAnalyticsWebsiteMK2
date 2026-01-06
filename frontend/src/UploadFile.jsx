@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { api } from './api/backend.js' 
 import './UploadFile.css'
 
 function UploadPage() {
@@ -11,8 +12,7 @@ function UploadPage() {
 
     // Fetch vehicles when component loads
     useEffect(() => {
-        fetch('http://127.0.0.1:3000/vehicles')
-            .then(res => res.json())
+	    api.getVehicles()
             .then(data => setVehicles(data))
             .catch(err => console.error('Error fetching vehicles:', err))
     }, [])
@@ -76,22 +76,12 @@ function UploadPage() {
                     setFileData('Sending request...')
 
                     try {
-                        console.log('About to fetch...')
+						console.log('About to fetch...')
 
-                        const res = await fetch('http://127.0.0.1:3000/datasets/upload', {
-                            method: 'POST',
-                            body: fd
-                        })
+                        const result = await api.uploadDataset(fd)
+                       	console.log('Fetch completed, status:', res.status)
 
-                        console.log('Fetch completed, status:', res.status)
-
-                        if (!res.ok) {
-                            const errorData = await res.json().catch(() => ({}))
-                            throw new Error(errorData.error || `Upload failed: ${res.status}`)
-                        }
-
-                        const result = await res.json()
-                        console.log('Result:', result)
+						console.log('Result:', result)
                         setFileData(`Upload success! Dataset ID: ${result.id}`)
                     } catch (err) {
                         console.error('Upload error:', err)

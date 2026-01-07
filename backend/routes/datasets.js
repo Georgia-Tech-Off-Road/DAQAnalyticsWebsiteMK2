@@ -74,6 +74,22 @@ router.post("/", (req, res) => {
     }
 })
 
+
+router.get('/data/:id', (req, res) => {
+	const dataset_ID = req.params.id;
+	const file_path = path.join(process.cwd(), "DAQFiles", `${dataset_ID}.txt`)
+	
+	fs.readFile(file_path, 'utf8', (err, data) => {
+		if (err) {
+			console.error(err)
+			res.send("Error reading file!")
+		} else {
+			let data_JSON = JSON.parse(data)
+			res.json(data_JSON)
+		}
+	})
+})
+
 router.post('/upload', upload.single('file'), (req, res) => {
     console.log('Upload request received:', req.body)
     console.log('File:', req.file)

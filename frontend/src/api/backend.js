@@ -6,6 +6,7 @@ const GET_VEHICLES_URL = `${API_BASE}/vehicles`
 // Datasets
 const GET_DATASETS_URL = `${API_BASE}/datasets/`
 const UPLOAD_DATASET_URL = `${API_BASE}/datasets/upload`
+
 export const api = {
 // Vehicles
 	async getVehicles() {
@@ -19,13 +20,13 @@ export const api = {
 		const res = await fetch(GET_DATASETS_URL)
 		const datasets = await res.json()
 		return datasets
-	}
+	},
 
 	async getDatasetByID(id) {
-		const res = await fetch(`GET_DATASETS_URL/${id}`)
-		const dataset = await res.json()
-		return datasets
-	}
+		const res = await fetch(`${GET_DATASETS_URL}${id}`)
+		if (!res.ok) throw new Error(`Failed to fetch dataset with ${id}`)
+		return res.json();
+	},
 
 	async uploadDataset(form_data) {
 		const res = await fetch(UPLOAD_DATASET_URL, {
@@ -35,5 +36,5 @@ export const api = {
 		if (!res.ok) throw new Error('Upload Failed')
 
 		return res.json()
-	}
+	},
 }

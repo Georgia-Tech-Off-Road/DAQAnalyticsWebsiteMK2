@@ -84,8 +84,7 @@ router.get('/data/:id', (req, res) => {
 			console.error(err)
 			res.send("Error reading file!")
 		} else {
-			let data_JSON = JSON.parse(data)
-			res.json(data_JSON)
+			res.send(data)
 		}
 	})
 })

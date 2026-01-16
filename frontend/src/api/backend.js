@@ -6,7 +6,7 @@ const GET_VEHICLES_URL = `${API_BASE}/vehicles`
 // Datasets
 const GET_DATASETS_URL = `${API_BASE}/datasets/`
 const UPLOAD_DATASET_URL = `${API_BASE}/datasets/upload`
-const GET_DATA_URL = `${API_BASE}/datasets/data/`
+const DOWNLOAD_DATA_URL = `${API_BASE}/datasets/download`
 
 
 async function getDatasetByID(id) {
@@ -43,16 +43,20 @@ export const api = {
 
 	async downloadDataset(id) {
 		// TODO: Make it so that datafile and dataset are fetched concurrently
-		const res = await fetch(GET_DATA_URL)
+		const res = await fetch(`${DOWNLOAD_DATA_URL}/${id}`)
+		// Get metadata associated with the dataset
 		const dataset = await getDatasetByID(id)
-		
+
 		if (!res.ok) {
 			throw new Error(`Failed to retrieve data file corresponding to the dataset with id: ${id}`)
 		}
+		// Get actual data
+		const blob = await res.blob();
 
-		const blob = await res.blob()
-
+		// Create temporary URL
 		const url = window.URL.createObjectURL(blob)
+
+		// Create invisible link
 		const a = document.createElement('a')
 		a.href = url
 		a.download = dataset.title

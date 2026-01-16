@@ -1,0 +1,32 @@
+.dataset-info {
+	display: block;
+	margin: 15px 10px;
+	pading: 10px;
+}
+
+.dataset-info > .headline {
+	display: block;	
+}
+
+
+.dataset-info > .headline > h1 {
+	font-size: 1.5rem;
+}
+
+.dataset-info > .info {
+	display: block;
+	align-items: ;
+	font-family: monospace;
+	font-size: 1.1rem;
+}
+
+.dataset-info > .description {
+	font-size: 0.85rem;
+
+
+.dataset-info > .toolbar {
+	display: flex;
+	justify-content: space-inbetween;
+	align-items: start;
+	float: left;
+}

@@ -21,7 +21,24 @@ function DatasetViewer () {
 			{loading ? (
 				<h1> Loading details... </h1>
 			) : (
-				<h1> {dataset.title} </h1>
+				<div className="dataset-info">
+					<div className="headline">
+						<h1> {dataset.title} </h1>
+					</div>
+
+					<div className="info">
+						<p> Date: {dataset.date} </p>
+						<p> Updated: {dataset.updated_at} </p>
+					</div>
+
+					<div className="description">
+						<p> {dataset.description} </p>
+					</div>
+
+					<div className="toolbar">
+						<button onClick={() => api.downloadDataset(dataset.id)}> Download </button>
+					</div>
+				</div>
 			)}
 		</>
 	)

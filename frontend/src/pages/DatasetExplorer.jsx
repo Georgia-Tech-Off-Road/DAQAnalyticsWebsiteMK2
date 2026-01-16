@@ -1,6 +1,7 @@
 import {useState, useEffect} from 'react'
 import { api } from	'../api/backend.js'
 import { Link } from 'react-router'
+import './DatasetExplorer.css'
 
 function DatasetExplorer() {
 	const [datasetSummaries, setDatasetSummaries] =	useState(null)
@@ -21,17 +22,21 @@ function DatasetExplorer() {
 	return (
 		<>
 			{ datasetsLoaded ? (
-				<ul>
+				<div className="explorer">
 					{datasetSummaries.map(summary =>
-						<li	key={summary.id}>
-							<Link to={`/dataset/${summary.id}`}>{summary.title}</Link>
-					        <button onClick={() => setOpenDropdown(summary.id)}>:</button>
-					        {true && (
-								<button onClick={() => api.downloadDataset(summary.id)}>Download</button>
-						    )}
-						</li>
+						<div key={summary.id} className="dataset-blk">
+					       	<span className="main-info">
+								<Link to={`/dataset/${summary.id}`} className="dataset-title">{summary.title}</Link>
+					            <h4 className="date">{summary.date}</h4>
+					        </span>
+						    <p>
+								{summary.description}
+						    </p>
+						    <span className="toolbar">
+						        <button onClick={() => api.downloadDataset(summary.id)}>Download</button>						    </span>
+						</div>
 					)}
-				</ul>
+				</div>
 			) : (
 				<h1> Loading datasets... </h1>
 			)}

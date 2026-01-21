@@ -6,6 +6,14 @@ const GET_VEHICLES_URL = `${API_BASE}/vehicles`
 // Datasets
 const GET_DATASETS_URL = `${API_BASE}/datasets/`
 const UPLOAD_DATASET_URL = `${API_BASE}/datasets/upload`
+const DOWNLOAD_DATA_URL = `${API_BASE}/datasets/download`
+
+
+async function getDatasetByID(id) {
+	const res = await fetch(`${GET_DATASETS_URL}${id}`)
+	if (!res.ok) throw new Error(`Failed to fetch dataset with ${id}`)
+	return res.json();
+}
 export const api = {
 // Vehicles
 	async getVehicles() {
@@ -19,13 +27,9 @@ export const api = {
 		const res = await fetch(GET_DATASETS_URL)
 		const datasets = await res.json()
 		return datasets
-	}
+	},
 
-	async getDatasetByID(id) {
-		const res = await fetch(`GET_DATASETS_URL/${id}`)
-		const dataset = await res.json()
-		return datasets
-	}
+	getDatasetByID,
 
 	async uploadDataset(form_data) {
 		const res = await fetch(UPLOAD_DATASET_URL, {
@@ -35,5 +39,34 @@ export const api = {
 		if (!res.ok) throw new Error('Upload Failed')
 
 		return res.json()
+	},
+
+	async downloadDataset(id) {
+		// TODO: Make it so that datafile and dataset are fetched concurrently
+		const res = await fetch(`${DOWNLOAD_DATA_URL}/${id}`)
+		// Get metadata associated with the dataset
+		const dataset = await getDatasetByID(id)
+
+		if (!res.ok) {
+			throw new Error(`Failed to retrieve data file corresponding to the dataset with id: ${id}`)
+		}
+		// Get actual data
+		const blob = await res.blob();
+
+		// Create temporary URL
+		const url = window.URL.createObjectURL(blob)
+
+		// Create invisible link
+		const a = document.createElement('a')
+		a.href = url
+		a.download = dataset.title
+		document.body.appendChild(a)
+		a.click()
+
+		// Cleanup
+		window.URL.revokeObjectURL(url)
+		document.body.removeChild(a)
 	}
 }
+
+

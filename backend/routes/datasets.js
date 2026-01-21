@@ -74,6 +74,20 @@ router.post("/", (req, res) => {
     }
 })
 
+
+router.get('/download/:id', (req, res) => {
+	const dataset_ID = req.params.id;
+	const file_path = path.join(process.cwd(), "DAQFiles", `${dataset_ID}.txt`)
+
+	res.download(file_path, (err) => {
+		if (err) {
+			console.error(err)
+			res.status(404).json({ error: "File not found" });
+		}
+	})
+
+})
+
 router.post('/upload', upload.single('file'), (req, res) => {
     console.log('Upload request received:', req.body)
     console.log('File:', req.file)

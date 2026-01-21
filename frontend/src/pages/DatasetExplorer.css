@@ -1,0 +1,42 @@
+.dataset-blk {
+	display: block;
+	padding: 15px 20px;
+	margin-left: 10px 5px;
+	border-bottom: 1px solid black;
+}
+
+.dataset-blk > .main-info {
+	display: flex;
+	align-items: baseline;
+	gap: 15px;
+	background-color: #FCC6BB;
+	justify-content: space-between;
+}
+
+
+.dataset-blk > .main-info .dataset-title {
+	font-size: 1.5rem;
+	font-weight: 500;
+	color: #1a0dab; /* Classic link color */
+	text-decoration: none;
+}
+/* Dataset Date  */
+.dataset-blk > .main-info .date {
+	font-size: 1.5rem;
+	font-family: monospace;
+	white-space: nowrap;
+	min-width: 100px;
+}
+
+/* Description */
+.dataset-blk p {
+	font-size: 1.0 rem;
+	margin-left: 5px;
+}
+
+/* Button Toolbar Styling */
+.dataset-blk >.toolbar {
+	diplay: flex;
+	justify-content: start;
+	align-items: baseline;
+}

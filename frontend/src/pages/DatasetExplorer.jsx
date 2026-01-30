@@ -33,7 +33,7 @@ function DatasetExplorer() {
 								{summary.description}
 							</p>
 							<span className="toolbar">
-								<button	onClick={()	=> api.downloadDataset(summary.id)}>Download</button>
+								<button	onClick={()	=> api.downloadDataset(summary.id, async () => api.getDatasetData(summary.id))}>Download</button>
 							</span>
 						</div>
 					)}

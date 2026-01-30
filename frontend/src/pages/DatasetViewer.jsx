@@ -36,7 +36,8 @@ function DatasetViewer () {
 					</div>
 
 					<div className="toolbar">
-						<button onClick={() => api.downloadDataset(dataset.id)}> Download </button>
+						<button onClick={() => api.downloadDataset(dataset.id, async () => api.getDatasetData(dataset.id))}> Download </button>
+						<a href={`/dataset/graph/${id}`}> <button> View Graph </button> </a>
 					</div>
 				</div>
 			)}

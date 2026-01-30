@@ -2,6 +2,7 @@ const express = require("express")
 const router = express.Router()
 const fs = require('node:fs')
 const db = require("../database/db")
+const db_lib = require("../database/db-lib")
 const crypto = require('crypto')
 const path = require('node:path')
 const cors = require('cors')
@@ -35,9 +36,8 @@ router.get("/", (req, res) => {
 })
 
 router.get("/:id", (req, res) => {
-    const stmt = db.prepare("SELECT * FROM Dataset WHERE id = ?");
-    const dataset = stmt.get(req.params.id)
-    res.json(dataset)
+	const dataset = db_lib.getDatasetByID(req.params.id)
+	res.json(dataset)
 })
 
 router.post("/", (req, res) => {
@@ -77,7 +77,7 @@ router.post("/", (req, res) => {
 
 router.get('/download/:id', (req, res) => {
 	const dataset_ID = req.params.id;
-	const file_path = path.join(process.cwd(), "DAQFiles", `${dataset_ID}.txt`)
+	const file_path = path.join(process.cwd(), "DAQFiles", `${dataset_ID}.json`)
 
 	res.download(file_path, (err) => {
 		if (err) {
@@ -86,6 +86,18 @@ router.get('/download/:id', (req, res) => {
 		}
 	})
 
+})
+
+router.get('/download/csv/:id', (req, res) => {
+	const dataset_ID = req.params.id;
+	const file_path = path.join(process.cwd(), "DAQFiles", `${dataset_ID}.json`)
+
+	res.download(file_path, (err) => {
+		if (err) {
+			console.error(err)
+			res.status(404).json({ error: "File not found" });
+		}
+	})
 })
 
 router.post('/upload', upload.single('file'), (req, res) => {

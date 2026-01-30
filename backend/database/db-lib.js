@@ -1,4 +1,11 @@
 const db = require("./db")
+
+function getDatasetByID(id) {
+	const stmt = db.prepare("SELECT * FROM Dataset WHERE id = ?");
+	const dataset = stmt.get(id)
+	return dataset
+}
+
 function fillDevelopmentDatabase() {
 	const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
 	const date = "2025-10-26 13:19:50"	
@@ -24,4 +31,4 @@ function fillDevelopmentDatabase() {
 	dataset_stmt.run()
 }
 
-module.exports = {fillDevelopmentDatabase};
+module.exports = {getDatasetByID, fillDevelopmentDatabase};

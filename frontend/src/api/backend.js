@@ -51,6 +51,17 @@ export const api = {
 		return await res.blob();
 	},
 
+	// Gets the data from the dataset in .csv format
+	async getDatasetDataCSV(id) {
+		const res = await fetch(`${DOWNLOAD_DATA_URL}/csv/${id}`)
+
+		if(!res.ok) {
+			throw new Error(`error: failed to retrieve .csv data  from dataset with id: ${id}`)
+		}
+
+		return await res.blob();
+	},
+
 	// Downloads a dataset, given a function that fetches the data
 	async downloadDataset(id, getDataFunc) {
 		// Get metadata

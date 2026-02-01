@@ -88,11 +88,53 @@ router.get('/download/:id', (req, res) => {
 
 })
 
-router.get('/download/csv/:id', (req, res) => {
+router.get('/download/csv/:id', async (req, res) => {
 	const dataset_ID = req.params.id;
-	const file_path = path.join(process.cwd(), "DAQFiles", `${dataset_ID}.json`)
+	const json_path = path.join(process.cwd(), "DAQFiles", `${dataset_ID}.json`)
+	const csv_path = path.join(process.cwd(), "DAQFiles", `${dataset_ID}.csv`)
 
-	res.download(file_path, (err) => {
+	const dataset_meta = db_lib.getDatasetByID(dataset_ID)
+	if (!dataset_meta) {
+		return res.status(404).json({ error: "Dataset not found" });
+	}
+
+	// Check if CSV needs to be generated
+	let needsConversion = false;
+
+	if (!fs.existsSync(csv_path)) {
+		needsConversion = true;
+	} else {
+		// Compare CSV file modification time with dataset's updated_at
+		const csvStats = fs.statSync(csv_path);
+		const csvModTime = csvStats.mtime;
+		const datasetUpdatedAt = new Date(dataset_meta.updated_at);
+
+		if (csvModTime < datasetUpdatedAt) {
+			needsConversion = true;
+		}
+	}
+
+	if (needsConversion) {
+		try {
+			const response = await fetch("http://127.0.0.1:5000/convert/json/csv", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					input_path: json_path,
+					output_path: csv_path
+				})
+			});
+
+			if (!response.ok) {
+				return res.status(500).json({ error: "Failed to convert JSON to CSV" });
+			}
+		} catch (err) {
+			console.error("Microservices error:", err);
+			return res.status(500).json({ error: "Microservices unavailable" });
+		}
+	}
+
+	res.download(csv_path, `${dataset_ID}.csv`, (err) => {
 		if (err) {
 			console.error(err)
 			res.status(404).json({ error: "File not found" });

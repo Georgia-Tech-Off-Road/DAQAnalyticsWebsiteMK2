@@ -8,6 +8,10 @@ const path = require('node:path')
 const cors = require('cors')
 const multer = require('multer')
 
+// Import and initialize storage system
+const storage_lib  = require('../storage')
+const storage = storage_lib.getStorage()
+
 // Enable CORS for this router
 router.use(cors())
 
@@ -16,7 +20,7 @@ if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true })
 }
 
-const storage = multer.diskStorage({
+const multer_storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, uploadDir)
     },
@@ -27,7 +31,7 @@ const storage = multer.diskStorage({
     }
 })
 
-const upload = multer({ storage })
+const upload = multer({ multer_storage })
 
 router.get("/", (req, res) => {
     const stmt = db.prepare("SELECT * FROM Dataset")
@@ -75,16 +79,42 @@ router.post("/", (req, res) => {
 })
 
 
-router.get('/download/:id', (req, res) => {
-	const dataset_ID = req.params.id;
-	const file_path = path.join(process.cwd(), "DAQFiles", `${dataset_ID}.json`)
+router.get('/download/:id', async (req, res) => {
+	const datasetID = req.params.id;
+	const key = `${dataset_ID}.json`
 
-	res.download(file_path, (err) => {
-		if (err) {
+	if (!db_lib.getDatasetByID(datasetID)) {
+		const err = `error: dataset with id ${req.params.id} does not exist.`
+		return res.status(404).json({ error: err })
+	}
+	try {
+		if (!await storage.exists(key)) {
+			const err = `error: datafile with key: ${key} does not exist, yet it has a corresponding dataset`
 			console.error(err)
-			res.status(404).json({ error: "File not found" });
+			return res.status(404).json({ error: err })
 		}
-	})
+
+		const metadata = await storage.stat(key)
+
+		res.setHeader('Content-Type', 'application/json')
+		res.setHeader('Content-Disposition', `attachment; filename="${datasetID}".json`
+		res.setHeader('Content-Length', metadata.size)
+
+		const stream = await storage.getReadStream(key)
+		stream.pipe(res)
+
+		stream.on('error' (err) => {
+			console.error('Stream error:', err);
+
+			if(!res.headersSent) {
+				return res.status(500).json({ error: "Error streaming file" });
+			}
+		})
+
+	} catch {
+		console.error("Download error:", err);
+		res.status(500).json({ error: "Error downloading file" });
+	}
 
 })
 

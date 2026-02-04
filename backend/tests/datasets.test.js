@@ -169,7 +169,7 @@ describe('Datasets API', () => {
                 .expect(404);
 
             expect(response.body).toHaveProperty('error');
-            expect(response.body.error).toContain('not found');
+            expect(response.body.error).toContain('does not exist');
         });
     });
 

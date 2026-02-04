@@ -99,6 +99,17 @@ class S3Storage extends Storage {
             Key: key
         }));
     }
+
+    async getReadStream(key) {
+        const { GetObjectCommand } = require('@aws-sdk/client-s3');
+
+        const response = await this.s3.send(new GetObjectCommand({
+            Bucket: this.bucket,
+            Key: key
+        }));
+
+        return response.Body;
+    }
 }
 
 module.exports = S3Storage;

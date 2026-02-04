@@ -8,6 +8,10 @@ const path = require('node:path')
 const cors = require('cors')
 const multer = require('multer')
 
+// Import and initialize storage system
+const storage_lib  = require('../storage')
+const storage = storage_lib.getStorage()
+
 // Enable CORS for this router
 router.use(cors())
 
@@ -16,7 +20,7 @@ if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true })
 }
 
-const storage = multer.diskStorage({
+const multer_storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, uploadDir)
     },
@@ -27,7 +31,7 @@ const storage = multer.diskStorage({
     }
 })
 
-const upload = multer({ storage })
+const upload = multer({ multer_storage })
 
 router.get("/", (req, res) => {
     const stmt = db.prepare("SELECT * FROM Dataset")
@@ -75,25 +79,51 @@ router.post("/", (req, res) => {
 })
 
 
-router.get('/download/:id', (req, res) => {
-	const dataset_ID = req.params.id;
-	const file_path = path.join(process.cwd(), "DAQFiles", `${dataset_ID}.json`)
+router.get('/download/:id', async (req, res) => {
+	const datasetID = req.params.id;
+	const key = `${datasetID}.json`
 
-	res.download(file_path, (err) => {
-		if (err) {
+	if (!db_lib.getDatasetByID(datasetID)) {
+		const err = `error: dataset with id ${datasetID} does not exist.`
+		return res.status(404).json({ error: err })
+	}
+	try {
+		if (!await storage.exists(key)) {
+			const err = `error: datafile with key: ${key} does not exist, yet it has a corresponding dataset`
 			console.error(err)
-			res.status(404).json({ error: "File not found" });
+			return res.status(404).json({ error: err })
 		}
-	})
+
+		const metadata = await storage.stat(key)
+
+		res.setHeader('Content-Type', 'application/json')
+		res.setHeader('Content-Disposition', `attachment; filename="${datasetID}.json"`)
+		res.setHeader('Content-Length', metadata.size)
+
+		const stream = await storage.getReadStream(key)
+		stream.pipe(res)
+
+		stream.on('error', (err) => {
+			console.error('Stream error:', err);
+
+			if(!res.headersSent) {
+				return res.status(500).json({ error: "Error streaming file" });
+			}
+		})
+
+	} catch (err) {
+		console.error("Download error:", err);
+		res.status(500).json({ error: "Error downloading file" });
+	}
 
 })
 
 router.get('/download/csv/:id', async (req, res) => {
-	const dataset_ID = req.params.id;
-	const json_path = path.join(process.cwd(), "DAQFiles", `${dataset_ID}.json`)
-	const csv_path = path.join(process.cwd(), "DAQFiles", `${dataset_ID}.csv`)
+	const datasetID = req.params.id;
+	const json_key = `${datasetID}.json`
+	const csv_key = `${datasetID}.csv`
 
-	const dataset_meta = db_lib.getDatasetByID(dataset_ID)
+	const dataset_meta = db_lib.getDatasetByID(datasetID)
 	if (!dataset_meta) {
 		return res.status(404).json({ error: "Dataset not found" });
 	}
@@ -101,12 +131,12 @@ router.get('/download/csv/:id', async (req, res) => {
 	// Check if CSV needs to be generated
 	let needsConversion = false;
 
-	if (!fs.existsSync(csv_path)) {
+	if (!await storage.exists(csv_key)) {
 		needsConversion = true;
 	} else {
 		// Compare CSV file modification time with dataset's updated_at
-		const csvStats = fs.statSync(csv_path);
-		const csvModTime = csvStats.mtime;
+		const csvStats = await storage.stat(csv_key);
+		const csvModTime = csvStats.lastModified;
 		const datasetUpdatedAt = new Date(dataset_meta.updated_at);
 
 		if (csvModTime < datasetUpdatedAt) {
@@ -114,14 +144,16 @@ router.get('/download/csv/:id', async (req, res) => {
 		}
 	}
 
+	// Call microservices
 	if (needsConversion) {
 		try {
+			// TODO: Replace hardcoded URL with env var
 			const response = await fetch("http://127.0.0.1:5000/convert/json/csv", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
-					input_path: json_path,
-					output_path: csv_path
+					input_path: json_key,
+					output_path: csv_key
 				})
 			});
 
@@ -134,12 +166,27 @@ router.get('/download/csv/:id', async (req, res) => {
 		}
 	}
 
-	res.download(csv_path, `${dataset_ID}.csv`, (err) => {
-		if (err) {
-			console.error(err)
-			res.status(404).json({ error: "File not found" });
-		}
-	})
+	try {
+		const metadata = await storage.stat(csv_key);
+
+		res.setHeader('Content-Type', 'text/csv');
+		res.setHeader('Content-Disposition', `attachment; filename="${datasetID}.csv"`);
+		res.setHeader('Content-Length', metadata.size);
+
+		const stream = await storage.getReadStream(csv_key)
+		stream.pipe(res)
+
+		stream.on('error', (err) => {
+			console.error('Stream error:', err);
+
+			if(!res.headersSent) {
+				return res.status(500).json({ error: "Error streaming file" });
+			}
+		})
+	} catch (err) {
+		console.error("Download error:", err);
+		res.status(500).json({ error: "Error downloading file" });
+	}
 })
 
 router.post('/upload', upload.single('file'), (req, res) => {

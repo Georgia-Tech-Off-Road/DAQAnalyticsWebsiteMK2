@@ -124,6 +124,68 @@ describe('LocalStorage', () => {
             await expect(storage.delete('nonexistent.txt')).rejects.toThrow();
         });
     });
+
+    describe('getReadStream()', () => {
+        test('should return a readable stream', async () => {
+            const content = 'test stream content';
+            const filePath = path.join(testDir, 'stream-test.txt');
+            await fsp.writeFile(filePath, content);
+
+            const stream = await storage.getReadStream('stream-test.txt');
+
+            expect(stream).toBeDefined();
+            expect(typeof stream.pipe).toBe('function');
+            expect(typeof stream.on).toBe('function');
+
+            // Clean up stream
+            stream.destroy();
+        });
+
+        test('should stream correct file contents', async () => {
+            const content = 'hello stream world';
+            const filePath = path.join(testDir, 'stream-test.txt');
+            await fsp.writeFile(filePath, content);
+
+            const stream = await storage.getReadStream('stream-test.txt');
+
+            // Collect stream data
+            const chunks = [];
+            for await (const chunk of stream) {
+                chunks.push(chunk);
+            }
+            const result = Buffer.concat(chunks).toString();
+
+            expect(result).toBe(content);
+        });
+
+        test('should stream large file in chunks', async () => {
+            // Create a file larger than default buffer size (64KB)
+            const content = 'x'.repeat(100000);
+            const filePath = path.join(testDir, 'large-file.txt');
+            await fsp.writeFile(filePath, content);
+
+            const stream = await storage.getReadStream('large-file.txt');
+
+            const chunks = [];
+            for await (const chunk of stream) {
+                chunks.push(chunk);
+            }
+            const result = Buffer.concat(chunks).toString();
+
+            expect(result.length).toBe(content.length);
+            expect(result).toBe(content);
+        });
+
+        test('should throw error for non-existent file', async () => {
+            const stream = await storage.getReadStream('nonexistent.txt');
+
+            // Error is emitted on the stream, not thrown immediately
+            await expect(new Promise((resolve, reject) => {
+                stream.on('error', reject);
+                stream.on('data', resolve);
+            })).rejects.toThrow();
+        });
+    });
 });
 
 describe('getStorage()', () => {

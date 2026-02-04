@@ -51,6 +51,16 @@ class Storage {
     async delete(key) {
         throw new Error('Method delete() must be implemented');
     }
+
+    /**
+     * Get a readable stream for the file.
+     * @param {string} key - The file path/key
+     * @returns {Promise<import('stream').Readable>} - Readable stream
+     * @throws {Error} - If file does not exist or cannot be read
+     */
+    async getReadStream(key) {
+        throw new Error('Method getReadStream() must be implemented');
+    }
 }
 
 module.exports = Storage;

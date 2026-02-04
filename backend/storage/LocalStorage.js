@@ -1,4 +1,5 @@
 const fs = require('node:fs/promises');
+const fsSync = require('node:fs');
 const path = require('node:path');
 const Storage = require('./Storage');
 
@@ -63,6 +64,11 @@ class LocalStorage extends Storage {
     async delete(key) {
         const filePath = this._resolvePath(key);
         await fs.unlink(filePath);
+    }
+
+    async getReadStream(key) {
+        const filePath = this._resolvePath(key);
+        return fsSync.createReadStream(filePath);
     }
 }
 

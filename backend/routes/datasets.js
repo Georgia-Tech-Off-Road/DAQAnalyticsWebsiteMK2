@@ -81,10 +81,10 @@ router.post("/", (req, res) => {
 
 router.get('/download/:id', async (req, res) => {
 	const datasetID = req.params.id;
-	const key = `${dataset_ID}.json`
+	const key = `${datasetID}.json`
 
 	if (!db_lib.getDatasetByID(datasetID)) {
-		const err = `error: dataset with id ${req.params.id} does not exist.`
+		const err = `error: dataset with id ${datasetID} does not exist.`
 		return res.status(404).json({ error: err })
 	}
 	try {
@@ -97,13 +97,13 @@ router.get('/download/:id', async (req, res) => {
 		const metadata = await storage.stat(key)
 
 		res.setHeader('Content-Type', 'application/json')
-		res.setHeader('Content-Disposition', `attachment; filename="${datasetID}".json`
+		res.setHeader('Content-Disposition', `attachment; filename="${datasetID}.json"`)
 		res.setHeader('Content-Length', metadata.size)
 
 		const stream = await storage.getReadStream(key)
 		stream.pipe(res)
 
-		stream.on('error' (err) => {
+		stream.on('error', (err) => {
 			console.error('Stream error:', err);
 
 			if(!res.headersSent) {
@@ -111,7 +111,7 @@ router.get('/download/:id', async (req, res) => {
 			}
 		})
 
-	} catch {
+	} catch (err) {
 		console.error("Download error:", err);
 		res.status(500).json({ error: "Error downloading file" });
 	}

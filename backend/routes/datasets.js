@@ -18,23 +18,26 @@ const MICROSERVICES_URL = process.env.MICROSERVICES_URL
 // Enable CORS for this router
 router.use(cors())
 
-const uploadDir = path.join(__dirname, 'DAQFiles')
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true })
+// Multer writes to a local temp dir for multipart parsing, then the route
+// handler moves the file into the abstract storage under a tmp/ prefix.
+const localTempDir = path.join(__dirname, '..', 'tmp', 'uploads')
+if (!fs.existsSync(localTempDir)) {
+    fs.mkdirSync(localTempDir, { recursive: true })
 }
 
-const multer_storage = multer.diskStorage({
+const tempStorage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, uploadDir)
+        cb(null, localTempDir)
     },
     filename: function (req, file, cb) {
-        // Create a safe filename: timestamp + original name with unsafe chars replaced
-        const safeName = Date.now() + '-' + file.originalname.replace(/[^a-zA-Z0-9.\-_]/g, '_')
-        cb(null, safeName)
+        const tempId = crypto.randomUUID()
+        req.tempId = tempId
+        const ext = path.extname(file.originalname)
+        cb(null, `${tempId}${ext}`)
     }
 })
 
-const upload = multer({ multer_storage })
+const upload = multer({ storage: tempStorage })
 
 router.get("/", (req, res) => {
     const stmt = db.prepare("SELECT * FROM Dataset")
@@ -192,62 +195,93 @@ router.get('/download/csv/:id', async (req, res) => {
 	}
 })
 
-router.post('/upload', upload.single('file'), (req, res) => {
-    console.log('Upload request received:', req.body)
-    console.log('File:', req.file)
-
+// Receives a dataset file and uploads it to a temporary folder for further processing, returns a temporary ID
+router.post('/upload', upload.single('file'), async (req, res) => {
     if (!req.file) {
         return res.status(400).json({ error: 'No file uploaded' })
     }
-    const { title, description, date, location_id, vehicle_id, competition } = req.body;
 
-    if (!title || !date) {
-        return res.status(400).json({ error: "Missing required fields"});
-    }
+    const tempId = req.tempId
+    const storageKey = `tmp/${tempId}`
+    const localPath = req.file.path
+
     try {
-        // Get a randomized cryptographic ID (very low chance of ID collision)
-        const id = crypto.randomUUID();
-        // Get current datetime in SQLite format (YYYY-MM-DD HH:MM:SS)
-        const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
+        // Move file from local temp dir into abstract storage
+        const data = await fs.promises.readFile(localPath)
+        await storage.write(storageKey, data)
+        await fs.promises.unlink(localPath)
 
-        // Convert date to SQLite format (YYYY-MM-DD HH:MM:SS)
-        // Handles both "YYYY-MM-DD" and "YYYY-MM-DDTHH:MM" formats
-        let formattedDate;
-        if (date.includes('T')) {
-            // datetime-local format: "2025-11-11T13:50"
-            formattedDate = date.replace('T', ' ') + ':00';
-        } else if (date.includes(':')) {
-            // Already in correct format
-            formattedDate = date;
-        } else {
-            // Date only: "2025-11-11"
-            formattedDate = `${date} 00:00:00`;
-        }
-
-        const stmt = db.prepare(`
-            INSERT INTO Dataset (id, title,
-                    description, date, uploaded_at, updated_at, location_id, vehicle_id, competition)
-            VALUES (@id, @title, @description, @date, @uploaded_at,
-                    @updated_at, @location_id, @vehicle_id, @competition)`)
-        stmt.run({
-            id: id,
-            title: title,
-            description: description || null,
-            date: formattedDate,
-            uploaded_at: now,
-            updated_at: now,
-            location_id: location_id || null,
-            vehicle_id: vehicle_id || null,
-            competition: competition ? 1 : 0,
-        });
-
-        console.log(`Dataset created successfully with ID: ${id}`)
-        res.status(201).json({ id, filename: req.file.filename })
+        res.status(201).json({ tempId })
+    } catch (err) {
+        console.error(`Error storing temp upload: ${err}`)
+        res.status(500).json({ error: err.message })
     }
-    catch (err) {
-        console.log(`Error creating dataset: ${err}`)
-        res.status(500).json( {error: err.message })
-    }
+})
+
+
+// Returns validation information on the temporary dataset
+router.post('/validate/:tempID', async (req, res) => {
+	// For now return a true validation for everything
+	return res.status(200).json({ valid: true })
+})
+
+// Confirms the upload: moves the temp file to permanent storage and creates the DB record
+router.post('/upload/confirm', async (req, res) => {
+	const { tempId, title, description, date, location_id, vehicle_id, competition } = req.body
+
+	if (!tempId || !title || !date) {
+		return res.status(400).json({ error: "Missing required fields (tempId, title, date)" })
+	}
+
+	const tempKey = `tmp/${tempId}`
+
+	try {
+		if (!await storage.exists(tempKey)) {
+			return res.status(404).json({ error: "Temp upload not found. It may have expired. Please re-upload the dataset." })
+		}
+
+		const id = crypto.randomUUID()
+		const now = new Date().toISOString().slice(0, 19).replace('T', ' ')
+
+		// Format date to SQLite datetime format (YYYY-MM-DD HH:MM:SS)
+		let formattedDate
+		if (date.includes('T')) {
+			formattedDate = date.replace('T', ' ') + ':00'
+		} else if (date.includes(':')) {
+			formattedDate = date
+		} else {
+			formattedDate = `${date} 00:00:00`
+		}
+
+		// Move temp file to permanent storage
+		const permanentKey = `${id}.json`
+		const data = await storage.read(tempKey)
+		await storage.write(permanentKey, data)
+		await storage.delete(tempKey)
+
+		// Insert dataset record
+		const stmt = db.prepare(`
+			INSERT INTO Dataset (id, title, description, date, uploaded_at, updated_at,
+			                     location_id, vehicle_id, competition)
+			VALUES (@id, @title, @description, @date, @uploaded_at,
+			        @updated_at, @location_id, @vehicle_id, @competition)`)
+		stmt.run({
+			id,
+			title,
+			description: description || null,
+			date: formattedDate,
+			uploaded_at: now,
+			updated_at: now,
+			location_id: location_id || null,
+			vehicle_id: vehicle_id || null,
+			competition: competition ? 1 : 0,
+		})
+
+		res.status(201).json({ id })
+	} catch (err) {
+		console.error(`Error confirming upload: ${err}`)
+		res.status(500).json({ error: err.message })
+	}
 })
 
 module.exports = router;

@@ -319,4 +319,218 @@ describe('Datasets API', () => {
             expect(response.headers['content-type']).toMatch(/text\/csv|application\/octet-stream/);
         });
     });
+
+    describe('POST /datasets/upload', () => {
+        const testUploadFile = path.join(__dirname, 'test-upload.csv');
+        const tempStorageDir = path.join(DAQ_FILES_DIR, 'tmp');
+
+        beforeEach(() => {
+            // Create a small CSV file to use as upload payload
+            fs.writeFileSync(testUploadFile, 'sec,microsec,rpm1\n1000,500,42\n');
+        });
+
+        afterEach(() => {
+            if (fs.existsSync(testUploadFile)) {
+                fs.unlinkSync(testUploadFile);
+            }
+            // Clean up any temp files created in storage
+            if (fs.existsSync(tempStorageDir)) {
+                fs.rmSync(tempStorageDir, { recursive: true, force: true });
+            }
+        });
+
+        test('should upload file and return tempId', async () => {
+            const response = await request(app)
+                .post('/datasets/upload')
+                .attach('file', testUploadFile)
+                .expect(201);
+
+            expect(response.body).toHaveProperty('tempId');
+            expect(response.body.tempId).toBeTruthy();
+        });
+
+        test('should store file in abstract storage under tmp/ prefix', async () => {
+            const response = await request(app)
+                .post('/datasets/upload')
+                .attach('file', testUploadFile)
+                .expect(201);
+
+            const tempId = response.body.tempId;
+            const storedPath = path.join(DAQ_FILES_DIR, 'tmp', tempId);
+            expect(fs.existsSync(storedPath)).toBe(true);
+
+            const content = fs.readFileSync(storedPath, 'utf-8');
+            expect(content).toContain('sec,microsec,rpm1');
+        });
+
+        test('should return 400 when no file is attached', async () => {
+            const response = await request(app)
+                .post('/datasets/upload')
+                .expect(400);
+
+            expect(response.body).toHaveProperty('error');
+            expect(response.body.error).toContain('No file uploaded');
+        });
+    });
+
+    describe('POST /datasets/validate/:tempID', () => {
+        test('should return valid: true', async () => {
+            const response = await request(app)
+                .post('/datasets/validate/any-temp-id')
+                .expect(200);
+
+            expect(response.body).toEqual({ valid: true });
+        });
+    });
+
+    describe('POST /datasets/upload/confirm', () => {
+        const testTempId = 'test-temp-id-for-confirm';
+        const tempFilePath = path.join(DAQ_FILES_DIR, 'tmp', testTempId);
+        const tempStorageDir = path.join(DAQ_FILES_DIR, 'tmp');
+        const sampleFileContent = JSON.stringify([{ sec: 1000, rpm1: 42 }]);
+
+        // Helper to seed a temp file in storage
+        function seedTempFile() {
+            fs.mkdirSync(tempStorageDir, { recursive: true });
+            fs.writeFileSync(tempFilePath, sampleFileContent);
+        }
+
+        afterEach(() => {
+            // Clean up temp and permanent files
+            if (fs.existsSync(tempStorageDir)) {
+                fs.rmSync(tempStorageDir, { recursive: true, force: true });
+            }
+            // Clean up any permanent files created by confirm
+            const files = fs.readdirSync(DAQ_FILES_DIR);
+            for (const file of files) {
+                if (file.endsWith('.json')) {
+                    fs.unlinkSync(path.join(DAQ_FILES_DIR, file));
+                }
+            }
+        });
+
+        test('should create dataset and move file to permanent storage', async () => {
+            seedTempFile();
+
+            const response = await request(app)
+                .post('/datasets/upload/confirm')
+                .send({
+                    tempId: testTempId,
+                    title: 'Confirmed Dataset',
+                    description: 'A confirmed test dataset',
+                    date: '2025-06-15 14:30:00',
+                    competition: true
+                })
+                .expect(201);
+
+            expect(response.body).toHaveProperty('id');
+            const datasetId = response.body.id;
+
+            // Verify DB record was created
+            const dataset = db.prepare('SELECT * FROM Dataset WHERE id = ?').get(datasetId);
+            expect(dataset.title).toBe('Confirmed Dataset');
+            expect(dataset.description).toBe('A confirmed test dataset');
+            expect(dataset.date).toBe('2025-06-15 14:30:00');
+            expect(dataset.competition).toBe(1);
+
+            // Verify permanent file exists
+            const permanentPath = path.join(DAQ_FILES_DIR, `${datasetId}.json`);
+            expect(fs.existsSync(permanentPath)).toBe(true);
+            expect(fs.readFileSync(permanentPath, 'utf-8')).toBe(sampleFileContent);
+
+            // Verify temp file was deleted
+            expect(fs.existsSync(tempFilePath)).toBe(false);
+        });
+
+        test('should return 400 when missing tempId', async () => {
+            const response = await request(app)
+                .post('/datasets/upload/confirm')
+                .send({ title: 'Test', date: '2025-01-01 00:00:00' })
+                .expect(400);
+
+            expect(response.body.error).toContain('Missing required fields');
+        });
+
+        test('should return 400 when missing title', async () => {
+            const response = await request(app)
+                .post('/datasets/upload/confirm')
+                .send({ tempId: testTempId, date: '2025-01-01 00:00:00' })
+                .expect(400);
+
+            expect(response.body.error).toContain('Missing required fields');
+        });
+
+        test('should return 400 when missing date', async () => {
+            const response = await request(app)
+                .post('/datasets/upload/confirm')
+                .send({ tempId: testTempId, title: 'Test' })
+                .expect(400);
+
+            expect(response.body.error).toContain('Missing required fields');
+        });
+
+        test('should return 404 when temp file does not exist', async () => {
+            const response = await request(app)
+                .post('/datasets/upload/confirm')
+                .send({
+                    tempId: 'non-existent-temp-id',
+                    title: 'Test',
+                    date: '2025-01-01 00:00:00'
+                })
+                .expect(404);
+
+            expect(response.body.error).toContain('Temp upload not found');
+        });
+
+        test('should format datetime-local date correctly', async () => {
+            seedTempFile();
+
+            const response = await request(app)
+                .post('/datasets/upload/confirm')
+                .send({
+                    tempId: testTempId,
+                    title: 'Date Format Test',
+                    date: '2025-11-11T13:50'
+                })
+                .expect(201);
+
+            const dataset = db.prepare('SELECT * FROM Dataset WHERE id = ?').get(response.body.id);
+            expect(dataset.date).toBe('2025-11-11 13:50:00');
+        });
+
+        test('should format date-only input correctly', async () => {
+            seedTempFile();
+
+            const response = await request(app)
+                .post('/datasets/upload/confirm')
+                .send({
+                    tempId: testTempId,
+                    title: 'Date Only Test',
+                    date: '2025-06-15'
+                })
+                .expect(201);
+
+            const dataset = db.prepare('SELECT * FROM Dataset WHERE id = ?').get(response.body.id);
+            expect(dataset.date).toBe('2025-06-15 00:00:00');
+        });
+
+        test('should set optional fields to null when not provided', async () => {
+            seedTempFile();
+
+            const response = await request(app)
+                .post('/datasets/upload/confirm')
+                .send({
+                    tempId: testTempId,
+                    title: 'Minimal Dataset',
+                    date: '2025-01-01 00:00:00'
+                })
+                .expect(201);
+
+            const dataset = db.prepare('SELECT * FROM Dataset WHERE id = ?').get(response.body.id);
+            expect(dataset.description).toBeNull();
+            expect(dataset.location_id).toBeNull();
+            expect(dataset.vehicle_id).toBeNull();
+            expect(dataset.competition).toBe(0);
+        });
+    });
 });

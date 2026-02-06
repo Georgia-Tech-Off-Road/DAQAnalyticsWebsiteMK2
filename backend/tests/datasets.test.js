@@ -403,7 +403,7 @@ describe('Datasets API', () => {
             // Clean up any permanent files created by confirm
             const files = fs.readdirSync(DAQ_FILES_DIR);
             for (const file of files) {
-                if (file.endsWith('.json')) {
+                if (file.endsWith('.json') && file != "1.json") {
                     fs.unlinkSync(path.join(DAQ_FILES_DIR, file));
                 }
             }

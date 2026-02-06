@@ -12,6 +12,9 @@ const multer = require('multer')
 const storage_lib  = require('../storage')
 const storage = storage_lib.getStorage()
 
+// Define Microservices URL
+const MICROSERVICES_URL = process.env.MICROSERVICES_URL
+
 // Enable CORS for this router
 router.use(cors())
 
@@ -148,7 +151,7 @@ router.get('/download/csv/:id', async (req, res) => {
 	if (needsConversion) {
 		try {
 			// TODO: Replace hardcoded URL with env var
-			const response = await fetch("http://127.0.0.1:5000/convert/json/csv", {
+			const response = await fetch(`${MICROSERVICES_URL}/convert/json/csv`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({

@@ -35,7 +35,6 @@ router.get('/:id', (req, res) => {
 })
 
 router.post('/', (req, res) => {
-    
     const { error } = schemas.Location.validate(req.body);
 
     if (error) {
@@ -54,11 +53,10 @@ router.post('/', (req, res) => {
 
     try {
         const stmt = db.prepare(`INSERT INTO Location (id, title,
-                description, competition, created_at, updated_at, 
+                description, competition, created_at, updated_at,
                 latitude, longitude, parent_id)
                 VALUES (@id, @title, @description, @competition, @created_at,
                     @updated_at, @latitude, @longitude, @parent_id)`);
-        
         stmt.run({
             id: id,
             title: title,

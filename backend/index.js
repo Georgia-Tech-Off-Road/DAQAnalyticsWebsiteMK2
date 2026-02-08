@@ -30,7 +30,6 @@ app.get('/', (req, res) => {
 })
 
 app.get('/data/:filePath', (req, res) => {
-	
 	fs.readFile(path.join('DAQFiles', req.params.filePath), 'utf8', (err, data) => {
 		if (err) {
 			console.error(err)

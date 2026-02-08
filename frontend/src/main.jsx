@@ -11,6 +11,7 @@ import VehicleView from "./VehicleSystems/ViewVehicles.jsx"
 import DatasetExplorer from "./pages/DatasetExplorer.jsx"
 import DatasetViewer from "./pages/DatasetViewer.jsx"
 import DatasetGraph from "./pages/DatasetGraph.jsx"
+import UploadDataset from "./pages/UploadDataset.jsx"
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>
@@ -19,6 +20,7 @@ createRoot(document.getElementById('root')).render(
                 <Route path="/" element={<Home />} />
                 <Route path="/test/:text" element={<Test />} />
                 <Route path="/UploadFile" element={<UploadPage />} />
+                <Route path="/UploadDataset" element={<UploadDataset />} />
                 <Route path="/UploadVehicle" element={<VehiclePage />} />
                 <Route path="/ViewVehicles" element={<VehicleView />} />
                 <Route path="/DatasetExplorer" element={<DatasetExplorer />} />

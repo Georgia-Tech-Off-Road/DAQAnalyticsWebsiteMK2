@@ -1,0 +1,116 @@
+.step-indicator {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #999;
+}
+
+.step-active {
+    color: #2c3e50;
+    font-weight: bold;
+}
+
+.step-done .step-number {
+    background-color: #27ae60;
+}
+
+.step-number {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: #ccc;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.step-active .step-number {
+    background-color: deepskyblue;
+}
+
+.drop-zone {
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    padding: 40px;
+    text-align: center;
+    cursor: pointer;
+    margin-bottom: 16px;
+    position: relative;
+}
+
+.drop-zone-active {
+    border-color: deepskyblue;
+    background-color: #f0f8ff;
+}
+
+.drop-zone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.btn-primary {
+    padding: 10px 24px;
+    background-color: deepskyblue;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: filter 300ms;
+}
+
+.btn-primary:hover {
+    filter: brightness(0.9);
+}
+
+.btn-primary:disabled {
+    background-color: gray;
+    cursor: not-allowed;
+}
+
+.error-text {
+    color: #e74c3c;
+}
+
+.required {
+    color: red;
+}
+
+.form-field {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.form-field label {
+    width: 160px;
+    flex-shrink: 0;
+}
+
+.form-field input,
+.form-field textarea,
+.form-field select {
+    width: 100%;
+    padding: 6px;
+    font-size: 14px;
+}
+
+.done-step {
+    text-align: center;
+}
+
+.done-step a {
+    color: deepskyblue;
+    font-size: 16px;
+}

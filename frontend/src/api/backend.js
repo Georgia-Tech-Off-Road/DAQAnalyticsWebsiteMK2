@@ -7,6 +7,9 @@ const GET_VEHICLES_URL = `${API_BASE}/vehicles`
 const GET_DATASETS_URL = `${API_BASE}/datasets/`
 const UPLOAD_DATASET_URL = `${API_BASE}/datasets/upload`
 const DOWNLOAD_DATA_URL = `${API_BASE}/datasets/download`
+const UPLOAD_TEMP_URL = `${API_BASE}/datasets/upload`
+const VALIDATE_URL = `${API_BASE}/datasets/validate`
+const CONFIRM_URL = `${API_BASE}/datasets/upload/confirm`
 
 async function getDatasetByID(id) {
 	const res = await fetch(`${GET_DATASETS_URL}${id}`)
@@ -38,6 +41,35 @@ export const api = {
 		});
 		if (!res.ok) throw new Error('Upload Failed')
 
+		return res.json()
+	},
+
+	async uploadTemp(file) {
+		const fd = new FormData()
+		fd.append('file', file)
+		const res = await fetch(UPLOAD_TEMP_URL, {
+			method: 'POST',
+			body: fd
+		})
+		if (!res.ok) throw new Error('Upload failed')
+		return res.json()
+	},
+
+	async validateTemp(tempId) {
+		const res = await fetch(`${VALIDATE_URL}/${tempId}`, {
+			method: 'POST'
+		})
+		if (!res.ok) throw new Error('Validation failed')
+		return res.json()
+	},
+
+	async confirmUpload(data) {
+		const res = await fetch(CONFIRM_URL, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(data)
+		})
+		if (!res.ok) throw new Error('Confirm failed')
 		return res.json()
 	},
 	// Gets the raw JSON data from the dataset

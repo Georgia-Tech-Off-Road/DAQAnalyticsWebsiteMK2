@@ -100,6 +100,18 @@ class S3Storage extends Storage {
         }));
     }
 
+    async datasetFiles(id) {
+        const { ListObjectsV2Command } = require('@aws-sdk/client-s3');
+
+        const response = await this.s3.send(new ListObjectsV2Command({
+            Bucket: this.bucket,
+            Prefix: `${id}.`
+        }));
+
+        if (!response.Contents) return [];
+        return response.Contents.map(obj => obj.Key);
+    }
+
     async getReadStream(key) {
         const { GetObjectCommand } = require('@aws-sdk/client-s3');
 

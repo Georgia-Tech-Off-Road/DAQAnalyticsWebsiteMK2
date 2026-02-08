@@ -320,6 +320,31 @@ describe('Datasets API', () => {
         });
     });
 
+    describe('GET /datasets/files/:id', () => {
+        test('should return empty array when no files exist for dataset', async () => {
+            const response = await request(app)
+                .get('/datasets/files/non-existent-id')
+                .expect(200);
+
+            expect(response.body).toEqual([]);
+        });
+
+        test('should return all files matching the dataset ID', async () => {
+            createTestJsonFile();
+            createTestCsvFile();
+
+            const response = await request(app)
+                .get(`/datasets/files/${testDatasetId}`)
+                .expect(200);
+
+            expect(response.body).toHaveLength(2);
+            expect(response.body.sort()).toEqual([
+                `${testDatasetId}.csv`,
+                `${testDatasetId}.json`
+            ]);
+        });
+    });
+
     describe('POST /datasets/upload', () => {
         const testUploadFile = path.join(__dirname, 'test-upload.csv');
         const tempStorageDir = path.join(DAQ_FILES_DIR, 'tmp');

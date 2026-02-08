@@ -6,6 +6,11 @@ function getDatasetByID(id) {
 	return dataset
 }
 
+function deleteDatasetByID(id) {
+	const stmt = db.prepare("DELETE FROM Dataset WHERE id = ?");
+	stmt.run(id)
+}
+
 function fillDevelopmentDatabase() {
 	const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
 	const date = "2025-10-26 13:19:50"	
@@ -31,4 +36,4 @@ function fillDevelopmentDatabase() {
 	dataset_stmt.run()
 }
 
-module.exports = {getDatasetByID, fillDevelopmentDatabase};
+module.exports = {getDatasetByID, deleteDatasetByID, fillDevelopmentDatabase};

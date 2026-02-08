@@ -50,6 +50,15 @@ router.get("/:id", (req, res) => {
 	res.json(dataset)
 })
 
+
+// Returns all files associated with a dataset
+router.get("/files/:id", async (req, res) => {
+	const datasetID = req.params.id
+	const files = await storage.datasetFiles(datasetID)
+
+	return res.json(files)
+})
+
 router.post("/", (req, res) => {
     const { title, description, date, location_id, competition } = req.body;
     if (!title || !date) {
@@ -83,7 +92,6 @@ router.post("/", (req, res) => {
         res.status(500).json( {error: err.message })
     }
 })
-
 
 router.get('/download/:id', async (req, res) => {
 	const datasetID = req.params.id;
@@ -282,6 +290,25 @@ router.post('/upload/confirm', async (req, res) => {
 		console.error(`Error confirming upload: ${err}`)
 		res.status(500).json({ error: err.message })
 	}
+})
+
+router.delete('/delete/:id', async (req, res) => {
+	const datasetID = req.params.id
+	const files = await storage.datasetFiles(datasetID)
+
+	try {
+		if (!db_lib.getDatasetByID(datasetID)) {
+			return res.status(404).json({ error: `dataset with ${datasetID} does not exist.` })
+		}
+		db_lib.deleteDatasetByID(datasetID)
+		for (const key of files) {
+			await storage.delete(key)
+		}
+	} catch (err) {
+		console.error(`Error deleting dataset ${datasetID}: ${err}`)
+		return res.status(500).json({ error: err.message })
+	}
+	return res.status(200).json({ message: `Dataset ${datasetID} deleted` })
 })
 
 module.exports = router;

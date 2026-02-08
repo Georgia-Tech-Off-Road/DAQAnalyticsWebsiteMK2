@@ -558,4 +558,35 @@ describe('Datasets API', () => {
             expect(dataset.competition).toBe(0);
         });
     });
+
+    describe('DELETE /datasets/delete/:id', () => {
+        test('should delete dataset record and associated files', async () => {
+            insertTestDataset();
+            createTestJsonFile();
+            createTestCsvFile();
+
+            const response = await request(app)
+                .delete(`/datasets/delete/${testDatasetId}`)
+                .expect(200);
+
+            expect(response.body.message).toContain(testDatasetId);
+
+            // Verify DB record was deleted
+            const dataset = db.prepare('SELECT * FROM Dataset WHERE id = ?').get(testDatasetId);
+            expect(dataset).toBeUndefined();
+
+            // Verify files were deleted
+            expect(fs.existsSync(testJsonPath)).toBe(false);
+            expect(fs.existsSync(testCsvPath)).toBe(false);
+        });
+
+        test('should return 404 for non-existent dataset', async () => {
+            const response = await request(app)
+                .delete('/datasets/delete/non-existent-id')
+                .expect(404);
+
+            expect(response.body).toHaveProperty('error');
+            expect(response.body.error).toContain('does not exist');
+        });
+    });
 });

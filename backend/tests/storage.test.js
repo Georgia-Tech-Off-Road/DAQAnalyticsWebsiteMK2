@@ -186,6 +186,35 @@ describe('LocalStorage', () => {
             })).rejects.toThrow();
         });
     });
+
+    describe('datasetFiles()', () => {
+        test('should return empty array when no files match', async () => {
+            const result = await storage.datasetFiles('nonexistent-id');
+            expect(result).toEqual([]);
+        });
+
+        test('should return all files matching the dataset ID across extensions', async () => {
+            const id = 'test-dataset-123';
+            await fsp.writeFile(path.join(testDir, `${id}.json`), 'json data');
+            await fsp.writeFile(path.join(testDir, `${id}.csv`), 'csv data');
+            // Unrelated file that should not match
+            await fsp.writeFile(path.join(testDir, 'other-id.json'), 'other');
+
+            const result = await storage.datasetFiles(id);
+
+            expect(result).toHaveLength(2);
+            expect(result.sort()).toEqual([`${id}.csv`, `${id}.json`]);
+        });
+
+        test('should not match files with ID as a prefix', async () => {
+            await fsp.writeFile(path.join(testDir, 'abc.json'), 'data');
+            await fsp.writeFile(path.join(testDir, 'abc-extra.json'), 'other');
+
+            const result = await storage.datasetFiles('abc');
+
+            expect(result).toEqual(['abc.json']);
+        });
+    });
 });
 
 describe('getStorage()', () => {

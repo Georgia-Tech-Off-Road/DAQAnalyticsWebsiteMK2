@@ -53,6 +53,15 @@ class Storage {
     }
 
     /**
+     * List all storage keys associated with a dataset ID.
+     * @param {string} id - The dataset ID
+     * @returns {Promise<string[]>} - Array of keys (e.g., ['id.json', 'id.csv'])
+     */
+    async datasetFiles(id) {
+        throw new Error('Method datasetFiles() must be implemented');
+    }
+
+    /**
      * Get a readable stream for the file.
      * @param {string} key - The file path/key
      * @returns {Promise<import('stream').Readable>} - Readable stream

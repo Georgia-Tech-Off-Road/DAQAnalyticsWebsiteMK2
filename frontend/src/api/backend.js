@@ -1,4 +1,4 @@
-const API_BASE = `http://127.0.0.1:3000`
+const API_BASE = import.meta.env.VITE_BACKEND_URL
 
 // Vehicles
 const GET_VEHICLES_URL = `${API_BASE}/vehicles`

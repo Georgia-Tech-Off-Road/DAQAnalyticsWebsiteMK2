@@ -59,40 +59,6 @@ router.get("/files/:id", async (req, res) => {
 	return res.json(files)
 })
 
-router.post("/", (req, res) => {
-    const { title, description, date, location_id, competition } = req.body;
-    if (!title || !date) {
-        return res.status(400).json({ error: "Missing required fields"});
-    }
-    try {
-        // Get a randomized cryptographic ID (very low chance of ID collision)
-        const id = crypto.randomUUID();
-        // Get current datetime in SQLite format (YYYY-MM-DD HH:MM:SS)
-        const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
-        const stmt = db.prepare(`
-            INSERT INTO Dataset (id, title,
-                                 description, date, uploaded_at, updated_at, location_id, vehicle_id, competition)
-            VALUES (@id, @title, @description, @date, @uploaded_at,
-                    @updated_at, @location_id, @vehicle_id, @competition)`)
-        stmt.run({
-            id: id,
-            title: title,
-            description: description || null,
-            date: date,
-            uploaded_at: now,
-            updated_at: now,
-            location_id: location_id || null,
-            vehicle_id: vehicle_id || null,
-            competition: competition ? 1 : 0,
-        });
-        res.status(201).json({ id })
-    }
-    catch (err) {
-        console.log(`Error creating dataset: ${err}`)
-        res.status(500).json( {error: err.message })
-    }
-})
-
 router.get('/download/:id', async (req, res) => {
 	const datasetID = req.params.id;
 	const key = `${datasetID}.json`

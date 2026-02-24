@@ -32,7 +32,12 @@ function getStorage() {
         storageInstance = new S3Storage(bucket);
     } else {
         // Default to local storage
-        const basePath = process.env.STORAGE_PATH || path.join(process.cwd(), 'DAQFiles');
+	let basePath
+	if (process.env.LOCAL_STORAGE_PATH) {
+	    basePath = path.join(process.cwd(), process.env.LOCAL_STORAGE_PATH)
+	} else {
+	    basePath = path.join(process.cwd(), 'DAQFiles')
+	}
         storageInstance = new LocalStorage(basePath);
     }
 

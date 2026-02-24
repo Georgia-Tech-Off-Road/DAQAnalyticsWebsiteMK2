@@ -10,7 +10,7 @@ global.fetch = mockFetch;
 
 const app = require('../index');
 
-const DAQ_FILES_DIR = path.join(process.cwd(), 'DAQFiles');
+const DAQ_FILES_DIR = path.join(process.cwd(), 'Test-DAQFiles');
 
 describe('Datasets API', () => {
     const testDatasetId = 'test-dataset-id-12345';
@@ -29,6 +29,10 @@ describe('Datasets API', () => {
         // Reset fetch mock
         mockFetch.mockReset();
 
+        if(!fs.existsSync(DAQ_FILES_DIR)) {
+	    fs.mkdirSync(DAQ_FILES_DIR)
+	}
+	
         // Clean up test files
         if (fs.existsSync(testJsonPath)) {
             fs.unlinkSync(testJsonPath);

@@ -1,5 +1,7 @@
 const db = require("./db")
 
+
+// Dataset functions
 function getDatasetByID(id) {
 	const stmt = db.prepare("SELECT * FROM Dataset WHERE id = ?");
 	const dataset = stmt.get(id)
@@ -9,6 +11,12 @@ function getDatasetByID(id) {
 function deleteDatasetByID(id) {
 	const stmt = db.prepare("DELETE FROM Dataset WHERE id = ?");
 	stmt.run(id)
+}
+
+function getUserByID(id) {
+	const stmt = db.prepare("SELECT * FROM Dataset WHERE id = ?");
+	const user = stmt.get(id)
+	return user
 }
 
 function fillDevelopmentDatabase() {

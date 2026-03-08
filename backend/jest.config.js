@@ -1,4 +1,5 @@
 module.exports = {
+      maxWorkers: 1,
       testEnvironment: 'node',
       coveragePathIgnorePatterns: ['/node_modules/'],
       testMatch: ['**/tests/**/*.test.js'],

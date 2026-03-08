@@ -1,29 +1,42 @@
+// Environmental Variables
+const MICROSERVICES_URL = process.env.MICROSERVICES_URL
+const SESSION_SECRET = process.env.SESSION_SECRET
+
+// Imports
 const express = require('express')
 const fs = require('node:fs')
 const app = express()
 const hostname = '127.0.0.1'
 const port = 3000
-const MICROSERVICES_URL = process.env.MICROSERVICES_URL
 const path = require('node:path')
 const cors = require('cors')
+const session = require('express-session')({
+	secret: SESSION_SECRET,
+	resave: false,
+	saveUninitialized: false,
+	cookie: { secure: (process.env.NODE_ENV === 'production') }
+});
+const passport = require('./middleware/auth/passport')
 
-app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 // Import routers
 const datasets = require('./routes/datasets')
 const vehicles = require('./routes/vehicles')
 const locations = require('./routes/locations')
+const auth = require('./routes/auth')
 
 // Define middleware first
 app.use(cors())
 app.use(express.json())
+app.use(session)
+app.use(passport.authenticate('session'))
 
 // Now define routes
 app.use("/datasets", datasets)
 app.use("/vehicles", vehicles)
 app.use("/locations", locations)
-
+app.use("/auth", auth)
 
 app.get('/', (req, res) => {
 	res.send('Hello world from our backend!');

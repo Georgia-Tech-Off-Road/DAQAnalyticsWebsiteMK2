@@ -1,4 +1,5 @@
 const db = require("./db")
+const bcrypt = require('bcrypt')
 
 
 // Dataset functions
@@ -53,6 +54,20 @@ function fillDevelopmentDatabase() {
 	vehicles_stmt.run()
 	location_stmt.run()
 	dataset_stmt.run()
+	insertTestUser()
+}
+
+function insertTestUser() {
+	const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
+	const hash = bcrypt.hashSync('password', 12);
+	db.prepare(`
+		INSERT OR IGNORE INTO "User" (id, email, display_name, role, last_login, created_at, updated_at)
+		VALUES ('1', 'testuser@gatech.edu', 'Test User', 'member', ?, ?, ?)
+	`).run(now, now, now);
+	db.prepare(`
+		INSERT OR IGNORE INTO AuthProvider (id, user_id, provider_type, provider_uid, password_hash)
+		VALUES ('1', '1', 'local', 'testuser', ?)
+	`).run(hash);
 }
 
 module.exports = {
@@ -60,4 +75,5 @@ module.exports = {
 	deleteDatasetByID,
 	getAuthProviderByLocalUsername,
 	getUserByID,
-	fillDevelopmentDatabase};
+	fillDevelopmentDatabase,
+	insertTestUser};

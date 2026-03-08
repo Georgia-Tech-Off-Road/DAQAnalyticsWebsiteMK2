@@ -1,5 +1,8 @@
 const db = require("./db")
+const bcrypt = require('bcrypt')
 
+
+// Dataset functions
 function getDatasetByID(id) {
 	const stmt = db.prepare("SELECT * FROM Dataset WHERE id = ?");
 	const dataset = stmt.get(id)
@@ -11,6 +14,31 @@ function deleteDatasetByID(id) {
 	stmt.run(id)
 }
 
+
+// AuthProvider Functions
+function getAuthProviderByLocalUsername(localUsername) {
+	const stmt = db.prepare(`
+	    SELECT * FROM AuthProvider
+		WHERE (provider_type = 'local' AND provider_uid = ?)
+		`);
+	return stmt.get(localUsername);
+}
+
+function getAuthProviderBySAMLUserID(samlUserID) {
+	const stmt = db.prepare(`
+		SELECT * FROM AuthProvider
+	    WHERE (provider_type = 'saml' AND provider_uid = ?)
+	`);
+	return stmt.get(samlUserID);
+}
+
+// User Functions
+function getUserByID(userID) {
+	const stmt = db.prepare(`
+		SELECT * FROM User WHERE id = ?
+	`);
+	return stmt.get(userID);
+}
 function fillDevelopmentDatabase() {
 	const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
 	const date = "2025-10-26 13:19:50"	
@@ -34,6 +62,26 @@ function fillDevelopmentDatabase() {
 	vehicles_stmt.run()
 	location_stmt.run()
 	dataset_stmt.run()
+	insertTestUser()
 }
 
-module.exports = {getDatasetByID, deleteDatasetByID, fillDevelopmentDatabase};
+function insertTestUser() {
+	const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
+	const hash = bcrypt.hashSync('password', 12);
+	db.prepare(`
+		INSERT OR IGNORE INTO "User" (id, email, display_name, role, last_login, created_at, updated_at)
+		VALUES ('1', 'testuser@gatech.edu', 'Test User', 'member', ?, ?, ?)
+	`).run(now, now, now);
+	db.prepare(`
+		INSERT OR IGNORE INTO AuthProvider (id, user_id, provider_type, provider_uid, password_hash)
+		VALUES ('1', '1', 'local', 'testuser', ?)
+	`).run(hash);
+}
+
+module.exports = {
+	getDatasetByID,
+	deleteDatasetByID,
+	getAuthProviderByLocalUsername,
+	getUserByID,
+	fillDevelopmentDatabase,
+	insertTestUser};

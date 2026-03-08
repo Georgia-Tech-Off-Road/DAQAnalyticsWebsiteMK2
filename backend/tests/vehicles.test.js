@@ -1,12 +1,25 @@
 const request = require('supertest');
 const app = require('../index');
 const db = require('../database/db.js');
+const db_lib = require('../database/db-lib');
 
 describe('Vehicles API', () => {
 
-    beforeEach(() => {
+    let agent;
+
+    beforeEach(async () => {
         // Clean up test data before each test
         db.prepare('DELETE FROM Vehicle').run();
+        db.prepare('DELETE FROM AuthProvider').run();
+        db.prepare('DELETE FROM "User"').run();
+
+        db_lib.insertTestUser();
+
+        // Create authenticated agent
+        agent = request.agent(app);
+        await agent
+            .post('/auth/local/login')
+            .send({ username: 'testuser', password: 'password' });
     });
 
     afterAll(() => {
@@ -16,7 +29,7 @@ describe('Vehicles API', () => {
 
     describe('GET /vehicles', () => {
         test('should return empty array when no vehicles exist', async () => {
-            const response = await request(app)
+            const response = await agent
                 .get('/vehicles')
                 .expect('Content-Type', /json/)
                 .expect(200);
@@ -38,7 +51,7 @@ describe('Vehicles API', () => {
                 @uploaded_at, @updated_at)`)
                 .run(testVehicle);
 
-            const response = await request(app)
+            const response = await agent
                 .get('/vehicles')
                 .expect(200);
 
@@ -54,7 +67,7 @@ describe('Vehicles API', () => {
                 description: 'A test vehicle'
             };
 
-            const response = await request(app)
+            const response = await agent
                 .post('/vehicles')
                 .send(newVehicle)
                 .expect('Content-Type', /json/)
@@ -75,7 +88,7 @@ describe('Vehicles API', () => {
                 title: 'Vehicle Without Description'
             };
 
-            const response = await request(app)
+            const response = await agent
                 .post('/vehicles')
                 .send(newVehicle)
                 .expect(201);
@@ -94,7 +107,7 @@ describe('Vehicles API', () => {
                 description: 'Missing title'
             };
 
-            const response = await request(app)
+            const response = await agent
                 .post('/vehicles')
                 .send(invalidVehicle)
                 .expect(400);
@@ -112,7 +125,7 @@ describe('Vehicles API', () => {
                 .run(testId, 'Test Vehicle', 'Desc',
                      '2025-01-01 00:00:00', '2025-01-01 00:00:00');
 
-            const response = await request(app)
+            const response = await agent
                 .get(`/vehicles/${testId}`)
                 .expect(200);
 
@@ -121,7 +134,7 @@ describe('Vehicles API', () => {
         });
 
         test('should return 404 for non-existent vehicle', async () => {
-            const response = await request(app)
+            const response = await agent
                 .get('/vehicles/non-existent-id')
                 .expect(404);
 
@@ -144,7 +157,7 @@ describe('Vehicles API', () => {
                 description: 'Updated Description'
             };
 
-            const response = await request(app)
+            const response = await agent
                 .put(`/vehicles/${testId}`)
                 .send(updatedData)
                 .expect(200);
@@ -170,7 +183,7 @@ describe('Vehicles API', () => {
                 description: 'Missing title'
             };
 
-            const response = await request(app)
+            const response = await agent
                 .put(`/vehicles/${testId}`)
                 .send(invalidUpdate)
                 .expect(400);
@@ -185,7 +198,7 @@ describe('Vehicles API', () => {
                 description: 'Updated Description'
             };
 
-            const response = await request(app)
+            const response = await agent
                 .put('/vehicles/non-existent-id')
                 .send(updatedData)
                 .expect(404);
@@ -203,7 +216,7 @@ describe('Vehicles API', () => {
                 .run(testId, 'Test Vehicle', 'Desc',
                      '2025-01-01 00:00:00', '2025-01-01 00:00:00');
 
-            const response = await request(app)
+            const response = await agent
                 .delete(`/vehicles/${testId}`)
                 .expect(200);
 
@@ -217,7 +230,7 @@ describe('Vehicles API', () => {
         });
 
         test('should return 404 when deleting non-existent vehicle', async () => {
-            const response = await request(app)
+            const response = await agent
                 .delete('/vehicles/non-existent-id')
                 .expect(404);
 

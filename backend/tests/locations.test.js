@@ -1,12 +1,25 @@
   const request = require('supertest');
   const app = require('../index');
   const db = require('../database/db.js');
+  const db_lib = require('../database/db-lib');
 
   describe('Locations API', () => {
 
-      beforeEach(() => {
+      let agent;
+
+      beforeEach(async () => {
           // Clean up test data before each test
           db.prepare('DELETE FROM Location').run();
+          db.prepare('DELETE FROM AuthProvider').run();
+          db.prepare('DELETE FROM "User"').run();
+
+          db_lib.insertTestUser();
+
+          // Create authenticated agent
+          agent = request.agent(app);
+          await agent
+              .post('/auth/local/login')
+              .send({ username: 'testuser', password: 'password' });
       });
 
       afterAll(() => {
@@ -16,7 +29,7 @@
 
       describe('GET /locations', () => {
           test('should return empty array when no locations exist', async () => {
-              const response = await request(app)
+              const response = await agent
                   .get('/locations')
                   .expect('Content-Type', /json/)
                   .expect(200);
@@ -42,7 +55,7 @@
                   @competition, @created_at, @updated_at, @latitude, @longitude, @parent_id)`)
                   .run(testLocation);
 
-              const response = await request(app)
+              const response = await agent
                   .get('/locations')
                   .expect(200);
 
@@ -61,7 +74,7 @@
                   longitude: -84.3963
               };
 
-              const response = await request(app)
+              const response = await agent
                   .post('/locations')
                   .send(newLocation)
                   .expect('Content-Type', /json/)
@@ -83,7 +96,7 @@
                   longitude: -84.3963
               };
 
-              const response = await request(app)
+              const response = await agent
                   .post('/locations')
                   .send(invalidLocation)
                   .expect(422);
@@ -99,7 +112,7 @@
                   longitude: -84.3963
               };
 
-              await request(app)
+              await agent
                   .post('/locations')
                   .send(invalidLocation)
                   .expect(422);
@@ -115,7 +128,7 @@
                        '2025-01-01 00:00:00', '2025-01-01 00:00:00',
                        33.7756, -84.3963, null);
 
-              const response = await request(app)
+              const response = await agent
                   .get(`/locations/${testId}`)
                   .expect(200);
 
@@ -124,7 +137,7 @@
           });
 
           test('should return 404 for non-existent location', async () => {
-              const response = await request(app)
+              const response = await agent
                   .get('/locations/non-existent-id')
                   .expect(404);
 

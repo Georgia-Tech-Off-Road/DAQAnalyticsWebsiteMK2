@@ -2,6 +2,7 @@ const request = require('supertest');
 const db = require('../database/db.js');
 const fs = require('node:fs');
 const path = require('node:path');
+const db_lib = require('../database/db-lib')
 
 // Store original fetch and create mock before importing app
 const originalFetch = global.fetch;
@@ -22,9 +23,21 @@ describe('Datasets API', () => {
         { sec: 1761484790, microsec: 7858044, rpm1: 100, rpm2: 50 }
     ];
 
-    beforeEach(() => {
+    let agent;
+
+    beforeEach(async () => {
         // Clean up test data before each test
+        db.prepare('DELETE FROM AuthProvider').run();
+        db.prepare('DELETE FROM "User"').run();
         db.prepare('DELETE FROM Dataset').run();
+
+        db_lib.insertTestUser();
+
+        // Create authenticated agent
+        agent = request.agent(app);
+        await agent
+            .post('/auth/local/login')
+            .send({ username: 'testuser', password: 'password' });
 
         // Reset fetch mock
         mockFetch.mockReset();
@@ -95,7 +108,7 @@ describe('Datasets API', () => {
 
     describe('GET /datasets', () => {
         test('should return empty array when no datasets exist', async () => {
-            const response = await request(app)
+            const response = await agent
                 .get('/datasets')
                 .expect('Content-Type', /json/)
                 .expect(200);
@@ -106,7 +119,7 @@ describe('Datasets API', () => {
         test('should return all datasets', async () => {
             insertTestDataset();
 
-            const response = await request(app)
+            const response = await agent
                 .get('/datasets')
                 .expect(200);
 
@@ -119,7 +132,7 @@ describe('Datasets API', () => {
             insertTestDataset({ id: 'dataset-1', title: 'Dataset One' });
             insertTestDataset({ id: 'dataset-2', title: 'Dataset Two' });
 
-            const response = await request(app)
+            const response = await agent
                 .get('/datasets')
                 .expect(200);
 
@@ -131,7 +144,7 @@ describe('Datasets API', () => {
         test('should return dataset by id', async () => {
             insertTestDataset();
 
-            const response = await request(app)
+            const response = await agent
                 .get(`/datasets/${testDatasetId}`)
                 .expect(200);
 
@@ -141,7 +154,7 @@ describe('Datasets API', () => {
         });
 
         test('should return undefined for non-existent dataset', async () => {
-            const response = await request(app)
+            const response = await agent
                 .get('/datasets/non-existent-id')
                 .expect(200);
 
@@ -155,7 +168,7 @@ describe('Datasets API', () => {
             insertTestDataset();
             createTestJsonFile();
 
-            const response = await request(app)
+            const response = await agent
                 .get(`/datasets/download/${testDatasetId}`)
                 .expect(200);
 
@@ -168,7 +181,7 @@ describe('Datasets API', () => {
             insertTestDataset();
             // Don't create the JSON file
 
-            const response = await request(app)
+            const response = await agent
                 .get(`/datasets/download/${testDatasetId}`)
                 .expect(404);
 
@@ -179,7 +192,7 @@ describe('Datasets API', () => {
 
     describe('GET /datasets/download/csv/:id', () => {
         test('should return 404 when dataset does not exist in database', async () => {
-            const response = await request(app)
+            const response = await agent
                 .get('/datasets/download/csv/non-existent-id')
                 .expect(404);
 
@@ -200,7 +213,7 @@ describe('Datasets API', () => {
                 };
             });
 
-            const response = await request(app)
+            const response = await agent
                 .get(`/datasets/download/csv/${testDatasetId}`)
                 .expect(200);
 
@@ -238,7 +251,7 @@ describe('Datasets API', () => {
                 };
             });
 
-            const response = await request(app)
+            const response = await agent
                 .get(`/datasets/download/csv/${testDatasetId}`)
                 .expect(200);
 
@@ -257,7 +270,7 @@ describe('Datasets API', () => {
             const recentDate = new Date('2025-01-15T00:00:00');
             setFileMtime(testCsvPath, recentDate);
 
-            const response = await request(app)
+            const response = await agent
                 .get(`/datasets/download/csv/${testDatasetId}`)
                 .expect(200);
 
@@ -277,7 +290,7 @@ describe('Datasets API', () => {
                 status: 500
             });
 
-            const response = await request(app)
+            const response = await agent
                 .get(`/datasets/download/csv/${testDatasetId}`)
                 .expect(500);
 
@@ -292,7 +305,7 @@ describe('Datasets API', () => {
             // Mock network error
             mockFetch.mockRejectedValueOnce(new Error('Connection refused'));
 
-            const response = await request(app)
+            const response = await agent
                 .get(`/datasets/download/csv/${testDatasetId}`)
                 .expect(500);
 
@@ -311,7 +324,7 @@ describe('Datasets API', () => {
             // Set CSV mtime to be newer than updated_at
             setFileMtime(testCsvPath, new Date('2025-01-10T00:00:00'));
 
-            const response = await request(app)
+            const response = await agent
                 .get(`/datasets/download/csv/${testDatasetId}`)
                 .expect(200);
 
@@ -326,7 +339,7 @@ describe('Datasets API', () => {
 
     describe('GET /datasets/files/:id', () => {
         test('should return empty array when no files exist for dataset', async () => {
-            const response = await request(app)
+            const response = await agent
                 .get('/datasets/files/non-existent-id')
                 .expect(200);
 
@@ -337,7 +350,7 @@ describe('Datasets API', () => {
             createTestJsonFile();
             createTestCsvFile();
 
-            const response = await request(app)
+            const response = await agent
                 .get(`/datasets/files/${testDatasetId}`)
                 .expect(200);
 
@@ -369,7 +382,7 @@ describe('Datasets API', () => {
         });
 
         test('should upload file and return tempId', async () => {
-            const response = await request(app)
+            const response = await agent
                 .post('/datasets/upload')
                 .attach('file', testUploadFile)
                 .expect(201);
@@ -379,7 +392,7 @@ describe('Datasets API', () => {
         });
 
         test('should store file in abstract storage under tmp/ prefix', async () => {
-            const response = await request(app)
+            const response = await agent
                 .post('/datasets/upload')
                 .attach('file', testUploadFile)
                 .expect(201);
@@ -393,7 +406,7 @@ describe('Datasets API', () => {
         });
 
         test('should return 400 when no file is attached', async () => {
-            const response = await request(app)
+            const response = await agent
                 .post('/datasets/upload')
                 .expect(400);
 
@@ -404,7 +417,7 @@ describe('Datasets API', () => {
 
     describe('POST /datasets/validate/:tempID', () => {
         test('should return valid: true', async () => {
-            const response = await request(app)
+            const response = await agent
                 .post('/datasets/validate/any-temp-id')
                 .expect(200);
 
@@ -441,7 +454,7 @@ describe('Datasets API', () => {
         test('should create dataset and move file to permanent storage', async () => {
             seedTempFile();
 
-            const response = await request(app)
+            const response = await agent
                 .post('/datasets/upload/confirm')
                 .send({
                     tempId: testTempId,
@@ -472,7 +485,7 @@ describe('Datasets API', () => {
         });
 
         test('should return 400 when missing tempId', async () => {
-            const response = await request(app)
+            const response = await agent
                 .post('/datasets/upload/confirm')
                 .send({ title: 'Test', date: '2025-01-01 00:00:00' })
                 .expect(400);
@@ -481,7 +494,7 @@ describe('Datasets API', () => {
         });
 
         test('should return 400 when missing title', async () => {
-            const response = await request(app)
+            const response = await agent
                 .post('/datasets/upload/confirm')
                 .send({ tempId: testTempId, date: '2025-01-01 00:00:00' })
                 .expect(400);
@@ -490,7 +503,7 @@ describe('Datasets API', () => {
         });
 
         test('should return 400 when missing date', async () => {
-            const response = await request(app)
+            const response = await agent
                 .post('/datasets/upload/confirm')
                 .send({ tempId: testTempId, title: 'Test' })
                 .expect(400);
@@ -499,7 +512,7 @@ describe('Datasets API', () => {
         });
 
         test('should return 404 when temp file does not exist', async () => {
-            const response = await request(app)
+            const response = await agent
                 .post('/datasets/upload/confirm')
                 .send({
                     tempId: 'non-existent-temp-id',
@@ -514,7 +527,7 @@ describe('Datasets API', () => {
         test('should format datetime-local date correctly', async () => {
             seedTempFile();
 
-            const response = await request(app)
+            const response = await agent
                 .post('/datasets/upload/confirm')
                 .send({
                     tempId: testTempId,
@@ -530,7 +543,7 @@ describe('Datasets API', () => {
         test('should format date-only input correctly', async () => {
             seedTempFile();
 
-            const response = await request(app)
+            const response = await agent
                 .post('/datasets/upload/confirm')
                 .send({
                     tempId: testTempId,
@@ -546,7 +559,7 @@ describe('Datasets API', () => {
         test('should set optional fields to null when not provided', async () => {
             seedTempFile();
 
-            const response = await request(app)
+            const response = await agent
                 .post('/datasets/upload/confirm')
                 .send({
                     tempId: testTempId,
@@ -569,7 +582,7 @@ describe('Datasets API', () => {
             createTestJsonFile();
             createTestCsvFile();
 
-            const response = await request(app)
+            const response = await agent
                 .delete(`/datasets/delete/${testDatasetId}`)
                 .expect(200);
 
@@ -585,7 +598,7 @@ describe('Datasets API', () => {
         });
 
         test('should return 404 for non-existent dataset', async () => {
-            const response = await request(app)
+            const response = await agent
                 .delete('/datasets/delete/non-existent-id')
                 .expect(404);
 

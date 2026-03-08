@@ -35,8 +35,8 @@ app.use(passport.authenticate('session'))
 
 // Now define routes
 app.use("/datasets", requireAuth, datasets)
-app.use("/vehicles", vehicles)
-app.use("/locations", locations)
+app.use("/vehicles", requireAuth, vehicles)
+app.use("/locations", requireAuth, locations)
 app.use("/auth", auth)
 
 app.get('/', (req, res) => {

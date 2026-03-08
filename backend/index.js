@@ -8,7 +8,6 @@ const fs = require('node:fs')
 const app = express()
 const hostname = '0.0.0.0'
 const port = process.env.BACKEND_PORT
-const MICROSERVICES_URL = process.env.MICROSERVICES_URL
 const path = require('node:path')
 const cors = require('cors')
 const session = require('express-session')({

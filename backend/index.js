@@ -17,6 +17,7 @@ const session = require('express-session')({
 	cookie: { secure: (process.env.NODE_ENV === 'production') }
 });
 const passport = require('./middleware/auth/passport')
+const { requireAuth } = require('./middleware/auth/auth')
 
 app.use(express.urlencoded({ extended: true }))
 
@@ -33,7 +34,7 @@ app.use(session)
 app.use(passport.authenticate('session'))
 
 // Now define routes
-app.use("/datasets", datasets)
+app.use("/datasets", requireAuth, datasets)
 app.use("/vehicles", vehicles)
 app.use("/locations", locations)
 app.use("/auth", auth)

@@ -13,12 +13,23 @@ function deleteDatasetByID(id) {
 	stmt.run(id)
 }
 
-function getUserByID(id) {
-	const stmt = db.prepare("SELECT * FROM Dataset WHERE id = ?");
-	const user = stmt.get(id)
-	return user
+
+// AuthProvider Functions
+function getAuthProviderByLocalUsername(localUsername) {
+	const stmt = db.prepare(`
+	    SELECT * FROM AuthProvider
+		WHERE (provider_type = 'local' AND provider_uid = ?)
+		`);
+	return stmt.get(localUsername);
 }
 
+// User Functions
+function getUserByID(userID) {
+	const stmt = db.prepare(`
+		SELECT * FROM User WHERE id = ?
+	`);
+	return stmt.get(userID);
+}
 function fillDevelopmentDatabase() {
 	const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
 	const date = "2025-10-26 13:19:50"	
@@ -44,4 +55,9 @@ function fillDevelopmentDatabase() {
 	dataset_stmt.run()
 }
 
-module.exports = {getDatasetByID, deleteDatasetByID, fillDevelopmentDatabase};
+module.exports = {
+	getDatasetByID,
+	deleteDatasetByID,
+	getAuthProviderByLocalUsername,
+	getUserByID,
+	fillDevelopmentDatabase};

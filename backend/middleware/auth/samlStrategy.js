@@ -14,8 +14,8 @@ if (SAML_ENTRY_POINT && SAML_CERT_PATH) {
 	samlStrategy = new SAMLStrategy(
 		{
 			entryPoint: SAML_ENTRY_POINT,
-			callbackUrl: "https://api.daq-datahub.com/auth/saml/callback",
-			issuer: "https://api.daq-datahub.com/auth/saml/metadata",
+			callbackUrl: "https://api.gtor-datahub.com/auth/saml/callback",
+			issuer: "https://api.gtor-datahub.com/auth/saml/metadata",
 			cert: cert,
 			idpCert: "placeholder_certificate"
 		},

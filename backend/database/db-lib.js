@@ -24,6 +24,14 @@ function getAuthProviderByLocalUsername(localUsername) {
 	return stmt.get(localUsername);
 }
 
+function getAuthProviderBySAMLUserID(samlUserID) {
+	const stmt = db.prepare(`
+		SELECT * FROM AuthProvider
+	    WHERE (provider_type = 'saml' AND provider_uid = ?)
+	`);
+	return stmt.get(samlUserID);
+}
+
 // User Functions
 function getUserByID(userID) {
 	const stmt = db.prepare(`

@@ -22,6 +22,12 @@ passport.use(new LocalStrategy(function verify(username, password, done) {
 		.catch((err) => done(err));
 }));
 
+const samlStrategy = require('./samlStrategy')
+
+if (samlStrategy !== null) {
+	passport.use(samlStrategy)
+}
+
 passport.serializeUser(function(user, done) {
 	done(null, user.id);
 });

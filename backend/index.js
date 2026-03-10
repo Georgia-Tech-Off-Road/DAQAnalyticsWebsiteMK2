@@ -1,6 +1,7 @@
 // Environmental Variables
 const MICROSERVICES_URL = process.env.MICROSERVICES_URL
 const SESSION_SECRET = process.env.SESSION_SECRET
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173'
 
 // Imports
 const express = require('express')
@@ -18,6 +19,10 @@ const session = require('express-session')({
 });
 const passport = require('./middleware/auth/passport')
 const { requireAuth } = require('./middleware/auth/auth')
+const corsOptions = {
+	origin: FRONTEND_URL,
+	credentials: true
+}
 
 app.use(express.urlencoded({ extended: true }))
 
@@ -28,7 +33,7 @@ const locations = require('./routes/locations')
 const auth = require('./routes/auth')
 
 // Define middleware first
-app.use(cors())
+app.use(cors(corsOptions))
 app.use(express.json())
 app.use(session)
 app.use(passport.authenticate('session'))

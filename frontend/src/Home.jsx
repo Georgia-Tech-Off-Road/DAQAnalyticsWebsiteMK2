@@ -16,6 +16,7 @@ function Home() {
             <a href="/UploadVehicle"> Vehicle Upload Page </a>
             <a href="/ViewVehicles"> Vehicle View Page </a>
             <a href="/datasetexplorer"> Dataset Explorer </a>
+            <a href="/login/local"> Login </a>
 
             <h1> Welcome to the Home Page! </h1>
             <img src = "https://gtor.gatech.edu/img/gtor-logo.jpg" alt = "GTOR logo" width="350"/>

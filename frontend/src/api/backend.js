@@ -11,25 +11,28 @@ const UPLOAD_TEMP_URL = `${API_BASE}/datasets/upload`
 const VALIDATE_URL = `${API_BASE}/datasets/validate`
 const CONFIRM_URL = `${API_BASE}/datasets/upload/confirm`
 
+// Auth
+const LOCAL_LOGIN_URL = `${API_BASE}/auth/local/login`
+const SESSION_URL = `${API_BASE}/auth/session`
+const LOGOUT_URL = `${API_BASE}/auth/logout`
+
 async function getDatasetByID(id) {
-	const res = await fetch(`${GET_DATASETS_URL}${id}`)
+	const res = await fetch(`${GET_DATASETS_URL}${id}`, { credentials: 'include' })
 	if (!res.ok) throw new Error(`Failed to fetch dataset with ${id}`)
 	return res.json();
 }
 
-
-
 export const api = {
 // Vehicles
 	async getVehicles() {
-		const res = await fetch(GET_VEHICLES_URL)
+		const res = await fetch(GET_VEHICLES_URL, { credentials: 'include' })
 		const vehicles = await res.json()
 		return vehicles
 	},
 
 // Datasets
 	async getDatasets() {
-		const res = await fetch(GET_DATASETS_URL)
+		const res = await fetch(GET_DATASETS_URL, { credentials: 'include' })
 		const datasets = await res.json()
 		return datasets
 	},
@@ -37,6 +40,7 @@ export const api = {
 	async uploadDataset(form_data) {
 		const res = await fetch(UPLOAD_DATASET_URL, {
 			method: 'POST',
+			credentials: 'include',
 			body: form_data
 		});
 		if (!res.ok) throw new Error('Upload Failed')
@@ -49,6 +53,7 @@ export const api = {
 		fd.append('file', file)
 		const res = await fetch(UPLOAD_TEMP_URL, {
 			method: 'POST',
+			credentials: 'include',
 			body: fd
 		})
 		if (!res.ok) throw new Error('Upload failed')
@@ -57,7 +62,8 @@ export const api = {
 
 	async validateTemp(tempId) {
 		const res = await fetch(`${VALIDATE_URL}/${tempId}`, {
-			method: 'POST'
+			method: 'POST',
+			credentials: 'include'
 		})
 		if (!res.ok) throw new Error('Validation failed')
 		return res.json()
@@ -66,6 +72,7 @@ export const api = {
 	async confirmUpload(data) {
 		const res = await fetch(CONFIRM_URL, {
 			method: 'POST',
+			credentials: 'include',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(data)
 		})
@@ -74,7 +81,7 @@ export const api = {
 	},
 	// Gets the raw JSON data from the dataset
 	async getDatasetData(id) {
-		const res = await fetch(`${DOWNLOAD_DATA_URL}/${id}`)
+		const res = await fetch(`${DOWNLOAD_DATA_URL}/${id}`, { credentials: 'include' })
 
 		if (!res.ok) {
 			throw new Error(`error: failed to retrieve data from dataset with id: ${id}`)
@@ -85,7 +92,7 @@ export const api = {
 
 	// Gets the data from the dataset in .csv format
 	async getDatasetDataCSV(id) {
-		const res = await fetch(`${DOWNLOAD_DATA_URL}/csv/${id}`)
+		const res = await fetch(`${DOWNLOAD_DATA_URL}/csv/${id}`, { credentials: 'include' })
 
 		if(!res.ok) {
 			throw new Error(`error: failed to retrieve .csv data  from dataset with id: ${id}`)
@@ -115,5 +122,31 @@ export const api = {
 		// Cleanup
 		window.URL.revokeObjectURL(url)
 		document.body.removeChild(a)
+	},
+
+	// Authentication
+	async loginLocal(username, password) {
+		const res = await fetch(LOCAL_LOGIN_URL, {
+			method: 'POST',
+			credentials: 'include',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ username, password }),
+		})
+		const data = res.ok ? await res.json() : null
+		return { ok: res.ok, status: res.status, data }
+	},
+
+	async getSession() {
+		const res = await fetch(SESSION_URL, { credentials: 'include' })
+		if (!res.ok) return null
+		return res.json()
+	},
+
+	async logout() {
+		const res = await fetch(LOGOUT_URL, {
+			method: 'POST',
+			credentials: 'include'
+		})
+		return res.ok
 	}
 }

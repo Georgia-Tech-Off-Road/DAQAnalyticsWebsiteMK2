@@ -2,12 +2,9 @@ const express = require('express')
 const router = express.Router()
 const db = require('../database/db')
 const crypto = require('crypto')
-const cors = require('cors')
 const validation = require('../middleware/validation/validation')
 const schemas = require('../middleware/validation/schemas')
 const Joi = require('joi')
-
-router.use(cors())
 
 router.get('/', (req, res) => {
     try {

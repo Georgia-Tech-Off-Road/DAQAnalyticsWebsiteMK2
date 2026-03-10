@@ -2,10 +2,6 @@ const express = require("express")
 const router = express.Router()
 const db = require("../database/db")
 const crypto = require('crypto')
-const cors = require('cors')
-
-router.use(cors())
-
 router.post('/', (req, res) => {
     console.log('Upload request received:', req.body)
 

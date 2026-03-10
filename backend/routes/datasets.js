@@ -5,7 +5,6 @@ const db = require("../database/db")
 const db_lib = require("../database/db-lib")
 const crypto = require('crypto')
 const path = require('node:path')
-const cors = require('cors')
 const multer = require('multer')
 
 // Import and initialize storage system
@@ -14,9 +13,6 @@ const storage = storage_lib.getStorage()
 
 // Define Microservices URL
 const MICROSERVICES_URL = process.env.MICROSERVICES_URL
-
-// Enable CORS for this router
-router.use(cors())
 
 // Multer writes to a local temp dir for multipart parsing, then the route
 // handler moves the file into the abstract storage under a tmp/ prefix.

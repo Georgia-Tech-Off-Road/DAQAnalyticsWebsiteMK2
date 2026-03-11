@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 # Overview
 Backend folder for our data analytics website
 

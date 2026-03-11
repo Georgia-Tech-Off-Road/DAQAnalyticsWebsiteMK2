@@ -26,6 +26,9 @@ const corsOptions = {
 
 app.use(express.urlencoded({ extended: true }))
 
+// Allow one hop from client to server (i.e reverse-proxy server)
+app.set('trust proxy', 1)
+
 // Import routers
 const datasets = require('./routes/datasets')
 const vehicles = require('./routes/vehicles')

@@ -34,7 +34,7 @@
                   .expect('Content-Type', /json/)
                   .expect(200);
 
-              expect(response.body.locations).toEqual([]);
+              expect(response.body).toEqual([]);
           });
 
           test('should return all locations', async () => {
@@ -59,8 +59,8 @@
                   .get('/locations')
                   .expect(200);
 
-              expect(response.body.locations).toHaveLength(1);
-              expect(response.body.locations[0].title).toBe('Test Track');
+              expect(response.body).toHaveLength(1);
+              expect(response.body[0].title).toBe('Test Track');
           });
       });
 
@@ -132,8 +132,8 @@
                   .get(`/locations/${testId}`)
                   .expect(200);
 
-              expect(response.body.location.id).toBe(testId);
-              expect(response.body.location.title).toBe('Test Track');
+              expect(response.body.id).toBe(testId);
+              expect(response.body.title).toBe('Test Track');
           });
 
           test('should return 404 for non-existent location', async () => {

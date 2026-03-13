@@ -13,6 +13,7 @@ import DatasetViewer from "./pages/DatasetViewer.jsx"
 import DatasetGraph from "./pages/DatasetGraph.jsx"
 import UploadDataset from "./pages/UploadDataset.jsx"
 import LocalLogin from "./pages/LocalLogin.jsx"
+import DatasetManager from "./pages/DatasetManager.jsx"
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>
@@ -28,6 +29,7 @@ createRoot(document.getElementById('root')).render(
                 <Route path="/dataset/:id" element={<DatasetViewer />} />
                 <Route path="/dataset/graph/:id" element={<DatasetGraph />} />
                 <Route path="/login/local" element={<LocalLogin />} />
+                <Route path="/manager" element={<DatasetManager />} />
             </Routes>
         </BrowserRouter>
     </StrictMode>,

@@ -40,7 +40,6 @@ app.use(cors(corsOptions))
 app.use(express.json())
 app.use(session)
 app.use(passport.authenticate('session'))
-
 // Now define routes
 app.use("/datasets", requireAuth, datasets)
 app.use("/vehicles", requireAuth, vehicles)

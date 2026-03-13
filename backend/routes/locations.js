@@ -9,8 +9,8 @@ const Joi = require('joi')
 router.get('/', (req, res) => {
     try {
         const stmt = db.prepare(`SELECT * FROM Location`)
-            const locations = stmt.all()
-        res.json({locations: locations})
+        const locations = stmt.all()
+        res.json(locations)
     } catch (err) {
         console.log(`Error when fetching locations: ${err}`)
         res.status(500).json({error: err.message})
@@ -24,7 +24,7 @@ router.get('/:id', (req, res) => {
         if (!location) {
             return res.status(404).json({error: `Location with ID: ${req.params.id} not found`})
         }
-        return res.json({location: location})
+        return res.json(location)
     } catch (err) {
         console.log(`Error retrieving location: ${err}`)
         return res.status(500).json({error: err.message })

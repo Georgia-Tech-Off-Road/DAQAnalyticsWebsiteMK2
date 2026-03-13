@@ -118,6 +118,7 @@ function ValidateStep({ tempId, onComplete }) {
 
 function MetadataStep({ tempId, onComplete }) {
     const [vehicles, setVehicles] = useState([])
+    const [locations, setLocations] = useState([])
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
 
@@ -125,6 +126,12 @@ function MetadataStep({ tempId, onComplete }) {
         api.getVehicles()
             .then(data => setVehicles(data))
             .catch(err => console.error('Error fetching vehicles:', err))
+    }, [])
+
+    useEffect(() => {
+		api.getLocations()
+			.then(data => setLocations(data))
+			.catch(err => console.error("Error fetching locations:", err))
     }, [])
 
     async function handleSubmit(e) {
@@ -172,8 +179,13 @@ function MetadataStep({ tempId, onComplete }) {
                 </div>
 
                 <div className="form-field">
-                    <label htmlFor="location_id">Location ID:</label>
-                    <input type="text" id="location_id" name="location_id" placeholder="e.g. Iron Mountain" />
+                    <label htmlFor="location_id">Location:</label>
+                    <select id="location_id" name="location_id">
+						<option value=""> Select a location... </option>
+						{locations.map(l => (
+							<option key={l.id} value={l.id}>{l.title}</option>
+						))}
+                    </select>
                 </div>
 
                 <div className="form-field">

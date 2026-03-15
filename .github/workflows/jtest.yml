@@ -3,8 +3,12 @@ name: JTest
 on:
   pull_request:
     branches: [ "main"]
+    paths:
+      - backend/**
   push:
     branches: [ "main" ]
+    paths:
+      - backend/**
 
 jobs:
   test:

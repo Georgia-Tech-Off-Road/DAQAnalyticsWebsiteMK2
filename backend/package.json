@@ -12,6 +12,7 @@
   "license": "MIT",
   "dependencies": {
     "@node-saml/passport-saml": "^5.1.0",
+    "aws-sdk": "^2.1693.0",
     "bcrypt": "^6.0.0",
     "better-sqlite3": "^12.4.1",
     "cors": "^2.8.5",

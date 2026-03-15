@@ -3,6 +3,9 @@ const API_BASE = import.meta.env.VITE_BACKEND_URL
 // Vehicles
 const GET_VEHICLES_URL = `${API_BASE}/vehicles`
 
+// Locations
+const GET_LOCATIONS_URL = `${API_BASE}/locations`
+
 // Datasets
 const GET_DATASETS_URL = `${API_BASE}/datasets/`
 const UPLOAD_DATASET_URL = `${API_BASE}/datasets/upload`
@@ -10,6 +13,7 @@ const DOWNLOAD_DATA_URL = `${API_BASE}/datasets/download`
 const UPLOAD_TEMP_URL = `${API_BASE}/datasets/upload`
 const VALIDATE_URL = `${API_BASE}/datasets/validate`
 const CONFIRM_URL = `${API_BASE}/datasets/upload/confirm`
+const DELETE_DATASET_URL = `${API_BASE}/datasets/delete`
 
 // Auth
 const LOCAL_LOGIN_URL = `${API_BASE}/auth/local/login`
@@ -29,6 +33,12 @@ export const api = {
 		const vehicles = await res.json()
 		return vehicles
 	},
+// Locations
+	async getLocations() {
+		const res = await fetch(GET_LOCATIONS_URL, { credentials: 'include' })
+		const locations = await res.json()
+		return locations
+	},
 
 // Datasets
 	async getDatasets() {
@@ -45,6 +55,14 @@ export const api = {
 		});
 		if (!res.ok) throw new Error('Upload Failed')
 
+		return res.json()
+	},
+
+	async deleteDataset(id) {
+		const res = await fetch(`${DELETE_DATASET_URL}/${id}`, {
+			method: 'DELETE',
+			credentials: 'include',
+		});
 		return res.json()
 	},
 
@@ -76,7 +94,10 @@ export const api = {
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(data)
 		})
-		if (!res.ok) throw new Error('Confirm failed')
+		if (!res.ok) {
+			let body = await res.json()
+			throw new Error(`Confirm failed: ${body.error}`)
+		}
 		return res.json()
 	},
 	// Gets the raw JSON data from the dataset

@@ -12,18 +12,19 @@ const port = process.env.BACKEND_PORT
 const path = require('node:path')
 const cors = require('cors')
 const session = require('express-session')({
-	secret: SESSION_SECRET,
-	resave: false,
-	saveUninitialized: false,
-	cookie: { secure: (process.env.NODE_ENV === 'production') }
+        secret: SESSION_SECRET,
+        resave: false,
+        saveUninitialized: false,
+        cookie: { secure: (process.env.NODE_ENV === 'production') }
 });
 const passport = require('./middleware/auth/passport')
 const { requireAuth } = require('./middleware/auth/auth')
 const corsOptions = {
-	origin: FRONTEND_URL,
-	credentials: true
+        origin: FRONTEND_URL,
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+        credentials: true
 }
-
 app.use(express.urlencoded({ extended: true }))
 
 // Allow one hop from client to server (i.e reverse-proxy server)
@@ -47,32 +48,31 @@ app.use("/locations", requireAuth, locations)
 app.use("/auth", auth)
 
 app.get('/', (req, res) => {
-	res.send('Hello world from our backend!');
+        res.send('Hello world from our backend!');
 })
 
 
 app.get('/echo/:msg', (req, res) => {
-	res.send(req.params.msg);
+        res.send(req.params.msg);
 })
 
 app.get("/test-microservices", (req, res) => {
-	fetch(`${MICROSERVICES_URL}/test`)
-	.then( (response) => {
-		return response.text()
-	})
-	.then(data => res.send(data))
-	.catch( (err) => {
-		console.error(err)
-		res.status(500).send("Error fetching from microservices")
-	})
+        fetch(`${MICROSERVICES_URL}/test`)
+        .then( (response) => {
+                return response.text()
+        })
+        .then(data => res.send(data))
+        .catch( (err) => {
+                console.error(err)
+                res.status(500).send("Error fetching from microservices")
+        })
 })
 
 if (require.main === module) {
-	app.listen(port, hostname, () => {
-	console.log(`App listenting on ${hostname}:${port}`);
-	});
+        app.listen(port, hostname, () => {
+        console.log(`App listenting on ${hostname}:${port}`);
+        });
 }
 
 
 module.exports = app;
-

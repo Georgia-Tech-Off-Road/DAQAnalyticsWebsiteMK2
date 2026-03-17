@@ -193,26 +193,30 @@ describe('LocalStorage', () => {
             expect(result).toEqual([]);
         });
 
-        test('should return all files matching the dataset ID across extensions', async () => {
+        test('should return all files in the dataset directory', async () => {
             const id = 'test-dataset-123';
-            await fsp.writeFile(path.join(testDir, `${id}.json`), 'json data');
-            await fsp.writeFile(path.join(testDir, `${id}.csv`), 'csv data');
-            // Unrelated file that should not match
-            await fsp.writeFile(path.join(testDir, 'other-id.json'), 'other');
+            await fsp.mkdir(path.join(testDir, id), { recursive: true });
+            await fsp.writeFile(path.join(testDir, `${id}/main.json`), 'json data');
+            await fsp.writeFile(path.join(testDir, `${id}/main.csv`), 'csv data');
+            // Unrelated directory that should not match
+            await fsp.mkdir(path.join(testDir, 'other-id'), { recursive: true });
+            await fsp.writeFile(path.join(testDir, 'other-id/main.json'), 'other');
 
             const result = await storage.datasetFiles(id);
 
             expect(result).toHaveLength(2);
-            expect(result.sort()).toEqual([`${id}.csv`, `${id}.json`]);
+            expect(result.sort()).toEqual([`${id}/main.csv`, `${id}/main.json`]);
         });
 
-        test('should not match files with ID as a prefix', async () => {
-            await fsp.writeFile(path.join(testDir, 'abc.json'), 'data');
-            await fsp.writeFile(path.join(testDir, 'abc-extra.json'), 'other');
+        test('should not include files from other dataset directories', async () => {
+            await fsp.mkdir(path.join(testDir, 'abc'), { recursive: true });
+            await fsp.writeFile(path.join(testDir, 'abc/main.json'), 'data');
+            await fsp.mkdir(path.join(testDir, 'abc-extra'), { recursive: true });
+            await fsp.writeFile(path.join(testDir, 'abc-extra/main.json'), 'other');
 
             const result = await storage.datasetFiles('abc');
 
-            expect(result).toEqual(['abc.json']);
+            expect(result).toEqual(['abc/main.json']);
         });
     });
 });

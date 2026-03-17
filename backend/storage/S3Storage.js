@@ -105,7 +105,7 @@ class S3Storage extends Storage {
 
         const response = await this.s3.send(new ListObjectsV2Command({
             Bucket: this.bucket,
-            Prefix: `${id}.`
+            Prefix: `${id}/`
         }));
 
         if (!response.Contents) return [];

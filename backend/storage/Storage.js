@@ -55,7 +55,7 @@ class Storage {
     /**
      * List all storage keys associated with a dataset ID.
      * @param {string} id - The dataset ID
-     * @returns {Promise<string[]>} - Array of keys (e.g., ['id.json', 'id.csv'])
+     * @returns {Promise<string[]>} - Array of keys (e.g., ['id/main.json', 'id/2x.csv'])
      */
     async datasetFiles(id) {
         throw new Error('Method datasetFiles() must be implemented');

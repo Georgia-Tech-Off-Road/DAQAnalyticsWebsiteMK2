@@ -67,11 +67,14 @@ class LocalStorage extends Storage {
     }
 
     async datasetFiles(id) {
-        const entries = await fs.readdir(this.basePath);
-        return entries.filter(name => {
-            const withoutExt = path.parse(name).name;
-            return withoutExt === id;
-        });
+        try {
+            const dir = path.join(this.basePath, `${id}`);
+            const entries = await fs.readdir(dir);
+            return entries.map(name => `${id}/${name}`);
+        } catch (err) {
+            if (err.code === 'ENOENT') return [];
+            throw err;
+        }
     }
 
     async getReadStream(key) {

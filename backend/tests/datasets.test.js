@@ -15,8 +15,8 @@ const DAQ_FILES_DIR = path.join(process.cwd(), 'Test-DAQFiles');
 
 describe('Datasets API', () => {
     const testDatasetId = 'test-dataset-id-12345';
-    const testJsonPath = path.join(DAQ_FILES_DIR, `${testDatasetId}.json`);
-    const testCsvPath = path.join(DAQ_FILES_DIR, `${testDatasetId}.csv`);
+    const testJsonPath = path.join(DAQ_FILES_DIR, `${testDatasetId}/main.json`);
+    const testCsvPath = path.join(DAQ_FILES_DIR, `${testDatasetId}/main.csv`);
 
     const sampleJsonData = [
         { sec: 1761484790, microsec: 7842085, rpm1: 0, rpm2: 0 },
@@ -45,23 +45,18 @@ describe('Datasets API', () => {
         if(!fs.existsSync(DAQ_FILES_DIR)) {
 	    fs.mkdirSync(DAQ_FILES_DIR)
 	}
-	
-        // Clean up test files
-        if (fs.existsSync(testJsonPath)) {
-            fs.unlinkSync(testJsonPath);
-        }
-        if (fs.existsSync(testCsvPath)) {
-            fs.unlinkSync(testCsvPath);
+        // Clean up test dataset directory
+        const testDatasetDir = path.join(DAQ_FILES_DIR, testDatasetId);
+        if (fs.existsSync(testDatasetDir)) {
+            fs.rmSync(testDatasetDir, { recursive: true, force: true });
         }
     });
 
     afterAll(() => {
-        // Clean up test files
-        if (fs.existsSync(testJsonPath)) {
-            fs.unlinkSync(testJsonPath);
-        }
-        if (fs.existsSync(testCsvPath)) {
-            fs.unlinkSync(testCsvPath);
+        // Clean up test dataset directory
+        const testDatasetDir = path.join(DAQ_FILES_DIR, testDatasetId);
+        if (fs.existsSync(testDatasetDir)) {
+            fs.rmSync(testDatasetDir, { recursive: true, force: true });
         }
         // Restore original fetch
         global.fetch = originalFetch;
@@ -93,11 +88,15 @@ describe('Datasets API', () => {
 
     // Helper to create test JSON file
     function createTestJsonFile() {
+        const dir = path.dirname(testJsonPath);
+        fs.mkdirSync(dir, { recursive: true });
         fs.writeFileSync(testJsonPath, JSON.stringify(sampleJsonData));
     }
 
     // Helper to create test CSV file with specific mtime
     function createTestCsvFile(content = 'sec,microsec,rpm1,rpm2\n1761484790,7842085,0,0') {
+        const dir = path.dirname(testCsvPath);
+        fs.mkdirSync(dir, { recursive: true });
         fs.writeFileSync(testCsvPath, content);
     }
 
@@ -356,8 +355,8 @@ describe('Datasets API', () => {
 
             expect(response.body).toHaveLength(2);
             expect(response.body.sort()).toEqual([
-                `${testDatasetId}.csv`,
-                `${testDatasetId}.json`
+                `${testDatasetId}/main.csv`,
+                `${testDatasetId}/main.json`
             ]);
         });
     });
@@ -442,11 +441,11 @@ describe('Datasets API', () => {
             if (fs.existsSync(tempStorageDir)) {
                 fs.rmSync(tempStorageDir, { recursive: true, force: true });
             }
-            // Clean up any permanent files created by confirm
-            const files = fs.readdirSync(DAQ_FILES_DIR);
-            for (const file of files) {
-                if (file.endsWith('.json') && file != "1.json") {
-                    fs.unlinkSync(path.join(DAQ_FILES_DIR, file));
+            // Clean up any dataset directories created by confirm
+            const entries = fs.readdirSync(DAQ_FILES_DIR, { withFileTypes: true });
+            for (const entry of entries) {
+                if (entry.isDirectory() && entry.name !== 'tmp') {
+                    fs.rmSync(path.join(DAQ_FILES_DIR, entry.name), { recursive: true, force: true });
                 }
             }
         });
@@ -476,7 +475,7 @@ describe('Datasets API', () => {
             expect(dataset.competition).toBe(1);
 
             // Verify permanent file exists
-            const permanentPath = path.join(DAQ_FILES_DIR, `${datasetId}.json`);
+            const permanentPath = path.join(DAQ_FILES_DIR, `${datasetId}/main.json`);
             expect(fs.existsSync(permanentPath)).toBe(true);
             expect(fs.readFileSync(permanentPath, 'utf-8')).toBe(sampleFileContent);
 

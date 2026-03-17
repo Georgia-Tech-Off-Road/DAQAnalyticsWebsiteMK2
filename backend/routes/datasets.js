@@ -57,7 +57,7 @@ router.get("/files/:id", async (req, res) => {
 
 router.get('/download/:id', async (req, res) => {
 	const datasetID = req.params.id;
-	const key = `${datasetID}.json`
+	const key = `${datasetID}/main.json`
 
 	if (!db_lib.getDatasetByID(datasetID)) {
 		const err = `error: dataset with id ${datasetID} does not exist.`
@@ -96,8 +96,8 @@ router.get('/download/:id', async (req, res) => {
 
 router.get('/download/csv/:id', async (req, res) => {
 	const datasetID = req.params.id;
-	const json_key = `${datasetID}.json`
-	const csv_key = `${datasetID}.csv`
+	const json_key = `${datasetID}/main.json`
+	const csv_key = `${datasetID}/main.csv`
 
 	const dataset_meta = db_lib.getDatasetByID(datasetID)
 	if (!dataset_meta) {
@@ -123,7 +123,6 @@ router.get('/download/csv/:id', async (req, res) => {
 	// Call microservices
 	if (needsConversion) {
 		try {
-			// TODO: Replace hardcoded URL with env var
 			const response = await fetch(`${MICROSERVICES_URL}/convert/json/csv`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
@@ -224,7 +223,7 @@ router.post('/upload/confirm', async (req, res) => {
 		}
 
 		// Move temp file to permanent storage
-		const permanentKey = `${id}.json`
+		const permanentKey = `${id}/main.json`
 		const data = await storage.read(tempKey)
 		await storage.write(permanentKey, data)
 		await storage.delete(tempKey)

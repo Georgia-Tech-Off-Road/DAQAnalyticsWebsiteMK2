@@ -15,6 +15,7 @@ import DatasetGraph from "./pages/DatasetGraph.jsx"
 import UploadDataset from "./pages/UploadDataset.jsx"
 import LocalLogin from "./pages/LocalLogin.jsx"
 import DatasetManager from "./pages/DatasetManager.jsx"
+import AuthErrorPage from "./pages/errorPages/AuthErrorPage.jsx"
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>
@@ -31,7 +32,11 @@ createRoot(document.getElementById('root')).render(
                 <Route path="/dataset/graph/:id" element={<DatasetGraph />} />
                 <Route path={urls.localLogin()} element={<LocalLogin />} />
                 <Route path={urls.manager()} element={<DatasetManager />} />
+
+       			# Error pages
+
+       			<Route path={urls.authErrorPage()} element={<AuthErrorPage />} />
             </Routes>
         </BrowserRouter>
-    </StrictMode>,
+    </StrictMode>
 )

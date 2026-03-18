@@ -34,10 +34,20 @@ export function datasetGraph(id) {
     return `/dataset/graph/${id}`
 }
 
+export function login() {
+	return localLogin()
+}
+
 export function localLogin() {
     return '/login/local'
 }
 
+
 export function manager() {
     return '/manager'
+}
+
+// Error Pages
+export function authErrorPage() {
+	return '/error/auth-error'
 }

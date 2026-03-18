@@ -1,6 +1,7 @@
 import { useState,useEffect,useRef } from 'react'
 
 import './App.css'
+import * as urls from './urls.js'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -14,9 +15,9 @@ function App() {
 
   return (
       <>
-          <a href="/UploadFile"> Upload Page </a>
+          <a href={urls.uploadFile()}> Upload Page </a>
 
-          <a href="/frontend/src/VehicleSystems/UploadVehicle"> Upload Page </a>
+          <a href={urls.uploadVehicle()}> Upload Page </a>
 
           <div className="card">
               <label htmlFor="fileDisplay">Select a file to display:</label>

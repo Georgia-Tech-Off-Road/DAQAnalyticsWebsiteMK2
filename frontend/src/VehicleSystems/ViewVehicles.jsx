@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import './Vehicle.css'
 import { api } from '../api/backend.js'
+import * as urls from '../urls.js'
 function VehicleView() {
     const [vehicles, setVehicles] = useState([])
     const [loading, setLoading] = useState(true)
@@ -97,7 +98,7 @@ function VehicleView() {
                 justifyContent: 'space-between'
             }}>
                 <button
-                    onClick={() => window.location.href = '/'}
+                    onClick={() => window.location.href = urls.home()}
                     style={{
                         backgroundColor: '#34495e',
                         color: 'white',
@@ -114,7 +115,7 @@ function VehicleView() {
                     View Vehicles
                 </h1>
                 <button
-                    onClick={() => window.location.href = '/UploadVehicle'}
+                    onClick={() => window.location.href = urls.uploadVehicle()}
                     style={{
                         backgroundColor: '#27ae60',
                         color: 'white',

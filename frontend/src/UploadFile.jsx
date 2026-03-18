@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { api } from './api/backend.js' 
 import './UploadFile.css'
+import * as urls from './urls.js'
 
 function UploadPage() {
     const fileInputRef = useRef(null)
@@ -34,7 +35,7 @@ function UploadPage() {
                 justifyContent: 'space-between'
             }}>
                 <button
-                    onClick={() => window.location.href = '/'}
+                    onClick={() => window.location.href = urls.home()}
                     style={{
                         backgroundColor: '#34495e',
                         color: 'white',

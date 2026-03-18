@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router';
 import { api } from '../api/backend.js'
+import * as urls from '../urls.js'
 
 function LocalLogin() {
 	const passwordRef = useRef(null);
@@ -12,7 +13,7 @@ function LocalLogin() {
 		setError(null);
 		const result = await api.loginLocal('testuser', passwordRef.current.value);
 		if (result.ok) {
-			navigate('/');
+			navigate(urls.home());
 		} else {
 			setError('Invalid credentials');
 		}

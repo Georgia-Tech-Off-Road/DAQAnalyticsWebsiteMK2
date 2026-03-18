@@ -1,5 +1,6 @@
 import './Home.css'
 import {useState } from 'react'
+import * as urls from './urls.js'
 
 function Home() {
     /* function setCount(newCounter) {
@@ -12,11 +13,11 @@ function Home() {
     // let [practice_status, practicesetStatus] = useState(false)
     return (
         <>
-            <a href="/UploadDataset"> File Upload Page </a>
-            <a href="/UploadVehicle"> Vehicle Upload Page </a>
-            <a href="/ViewVehicles"> Vehicle View Page </a>
-            <a href="/datasetexplorer"> Dataset Explorer </a>
-            <a href="/login/local"> Login </a>
+            <a href={urls.uploadDataset()}> File Upload Page </a>
+            <a href={urls.uploadVehicle()}> Vehicle Upload Page </a>
+            <a href={urls.viewVehicles()}> Vehicle View Page </a>
+            <a href={urls.datasetExplorer()}> Dataset Explorer </a>
+            <a href={urls.localLogin()}> Login </a>
 
             <h1> Welcome to the Home Page! </h1>
             <img src = "https://gtor.gatech.edu/img/gtor-logo.jpg" alt = "GTOR logo" width="350"/>

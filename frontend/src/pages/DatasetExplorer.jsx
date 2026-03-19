@@ -2,6 +2,7 @@ import {useState, useEffect} from 'react'
 import { api } from	'../api/backend.js'
 import { Link }	from 'react-router'
 import './DatasetExplorer.css'
+import * as urls from '../urls.js'
 
 function DatasetExplorer() {
 	const [datasetSummaries, setDatasetSummaries] =	useState(null)
@@ -26,7 +27,7 @@ function DatasetExplorer() {
 					{datasetSummaries.map(summary =>
 						<div key={summary.id} className="dataset-blk">
 							<span className="main-info">
-								<Link to={`/dataset/${summary.id}`}	className="dataset-title">{summary.title}</Link>
+								<Link to={urls.dataset(summary.id)}	className="dataset-title">{summary.title}</Link>
 								<h4	className="date">{summary.date}</h4>
 							</span>
 							<p>

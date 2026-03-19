@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api/backend.js'
 import { useParams } from 'react-router'
+import * as urls from '../urls.js'
 
 function DatasetViewer () {
 	const { id } = useParams()
@@ -38,7 +39,7 @@ function DatasetViewer () {
 					<div className="toolbar">
 						<button onClick={() => api.downloadDataset(dataset.id, async () => api.getDatasetData(dataset.id))}> Download JSON</button>
 						<button onClick={() => api.downloadDataset(dataset.id, async () => api.getDatasetDataCSV(dataset.id))}> Download CSV </button>
-						<a href={`/dataset/graph/${id}`}> <button> View Graph </button> </a>
+						<a href={urls.datasetGraph(id)}> <button> View Graph </button> </a>
 					</div>
 				</div>
 			)}

@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react'
 import './Vehicle.css'
+import * as urls from '../urls.js'
 
 function VehiclePage() {
     const formRef = useRef(null)
@@ -25,7 +26,7 @@ function VehiclePage() {
                 justifyContent: 'space-between'
             }}>
                 <button
-                    onClick={() => window.location.href = '/'}
+                    onClick={() => window.location.href = urls.home()}
                     style={{
                         backgroundColor: '#34495e',
                         color: 'white',
@@ -43,7 +44,7 @@ function VehiclePage() {
                 </h1>
                 <div></div>
                 <button
-                    onClick={() => window.location.href = '/ViewVehicles'}
+                    onClick={() => window.location.href = urls.viewVehicles()}
                     style={{
                         backgroundColor: '#27ae60',
                         color: 'white',

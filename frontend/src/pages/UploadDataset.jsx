@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { api } from '../api/backend.js'
 import './UploadDataset.css'
+import * as urls from '../urls.js'
 
 const STEPS = ['upload', 'validate', 'metadata']
 
@@ -239,7 +240,7 @@ function UploadDataset() {
                 justifyContent: 'space-between'
             }}>
                 <button
-                    onClick={() => window.location.href = '/'}
+                    onClick={() => window.location.href = urls.home()}
                     style={{
                         backgroundColor: '#34495e',
                         color: 'white',
@@ -289,7 +290,7 @@ function UploadDataset() {
                     <div className="done-step">
                         <h2>Upload Complete</h2>
                         <p>Dataset ID: {datasetId}</p>
-                        <a href={`/dataset/${datasetId}`}>View Dataset</a>
+                        <a href={urls.dataset(datasetId)}>View Dataset</a>
                     </div>
                 )}
             </div>

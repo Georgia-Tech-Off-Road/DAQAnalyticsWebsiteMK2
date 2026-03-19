@@ -17,6 +17,12 @@ import LocalLogin from "./pages/LocalLogin.jsx"
 import DatasetManager from "./pages/DatasetManager.jsx"
 import AuthErrorPage from "./pages/errorPages/AuthErrorPage.jsx"
 
+// Library Functions
+import AuthRequired from "./lib/AuthRequired.jsx"
+
+const datasetExplorer = <AuthRequired> <DatasetExplorer /> </AuthRequired>
+const datasetViewer = <AuthRequired> <DatasetViewer /> </AuthRequired>
+const datasetGraph = <AuthRequired> <DatasetGraph /> </AuthRequired>
 createRoot(document.getElementById('root')).render(
     <StrictMode>
         <BrowserRouter>
@@ -27,9 +33,9 @@ createRoot(document.getElementById('root')).render(
                 <Route path={urls.uploadDataset()} element={<UploadDataset />} />
                 <Route path={urls.uploadVehicle()} element={<VehiclePage />} />
                 <Route path={urls.viewVehicles()} element={<VehicleView />} />
-                <Route path={urls.datasetExplorer()} element={<DatasetExplorer />} />
-                <Route path="/dataset/:id" element={<DatasetViewer />} />
-                <Route path="/dataset/graph/:id" element={<DatasetGraph />} />
+                <Route path={urls.datasetExplorer()} element={datasetExplorer} />
+                <Route path="/dataset/:id" element={datasetViewer} />
+                <Route path="/dataset/graph/:id" element={datasetGraph} />
                 <Route path={urls.localLogin()} element={<LocalLogin />} />
                 <Route path={urls.manager()} element={<DatasetManager />} />
 

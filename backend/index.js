@@ -11,12 +11,25 @@ const hostname = '0.0.0.0'
 const port = process.env.BACKEND_PORT
 const path = require('node:path')
 const cors = require('cors')
+
+const express_session = require("express-session")
+const session_db = require("./database/session-db")
+const SqliteStore = require("better-sqlite3-session-store")(express_session)
+const session_store = new SqliteStore({
+	client: session_db,
+	expired: {
+		clear: true,
+		intervalMS: process.env.SESSION_DURATION || 21600000 // Defaults to 6 hrs.
+	}
+})
 const session = require('express-session')({
+		store: session_store,
         secret: SESSION_SECRET,
         resave: false,
         saveUninitialized: false,
         cookie: { secure: (process.env.NODE_ENV === 'production') }
 });
+
 const passport = require('./middleware/auth/passport')
 const { requireAuth } = require('./middleware/auth/auth')
 const corsOptions = {

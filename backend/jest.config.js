@@ -8,5 +8,6 @@ module.exports = {
           'middleware/**/*.js',
           '!**/node_modules/**'
       ],
+      forceExit: true,
       testPathIgnorePatterns: ['/node_modules/']
     };

@@ -19,7 +19,10 @@ function DatasetGraph()	{
 			.then((rawData)	=> JSON.parse(rawData))
 			.then((dataJSON) =>	{
 				// Take only every 100th data point at the moment. Need to figure out different data granularities for different zoom levels
-				let	filteredData = dataJSON.filter((elem, i) =>	i %	100 == 0)
+				const DESIRED_POINTS = 5000
+				let filterRate = Math.round(dataJSON.length / DESIRED_POINTS)
+				filterRate = filterRate > 1 ? filterRate : 1;
+				let	filteredData = dataJSON.filter((elem, i) =>	i %	filterRate == 0)
 				console.log(filteredData)
 				let allSensors = Array.from(new Set(dataJSON.flatMap(Object.keys)))
 				const EXCLUDED = new Set(["microsec", "sec"])

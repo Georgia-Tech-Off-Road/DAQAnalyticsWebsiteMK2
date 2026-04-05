@@ -36,8 +36,15 @@ const tempStorage = multer.diskStorage({
 const upload = multer({ storage: tempStorage })
 
 router.get("/", (req, res) => {
-    const stmt = db.prepare("SELECT * FROM Dataset")
-    const datasets = stmt.all()
+	let { search } = req.query
+	let stmt, datasets
+	if (search) {
+		stmt = db.prepare("SELECT * FROM Dataset WHERE title LIKE ? OR description LIKE ?")
+		datasets = stmt.all(`%${search}%`, `%${search}%`)
+	} else {
+	    stmt = db.prepare("SELECT * FROM Dataset")
+	    datasets = stmt.all()
+	}
     res.json(datasets)
 })
 

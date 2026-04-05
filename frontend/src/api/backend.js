@@ -7,7 +7,7 @@ const GET_VEHICLES_URL = `${API_BASE}/vehicles`
 const GET_LOCATIONS_URL = `${API_BASE}/locations`
 
 // Datasets
-const GET_DATASETS_URL = `${API_BASE}/datasets/`
+const GET_DATASETS_URL = `${API_BASE}/datasets`
 const UPLOAD_DATASET_URL = `${API_BASE}/datasets/upload`
 const DOWNLOAD_DATA_URL = `${API_BASE}/datasets/download`
 const UPLOAD_TEMP_URL = `${API_BASE}/datasets/upload`
@@ -21,7 +21,7 @@ const SESSION_URL = `${API_BASE}/auth/session`
 const LOGOUT_URL = `${API_BASE}/auth/logout`
 
 async function getDatasetByID(id) {
-	const res = await fetch(`${GET_DATASETS_URL}${id}`, { credentials: 'include' })
+	const res = await fetch(`${`${API_BASE}/datasets/`}${id}`, { credentials: 'include' })
 	if (!res.ok) throw new Error(`Failed to fetch dataset with ${id}`)
 	return res.json();
 }
@@ -41,8 +41,9 @@ export const api = {
 	},
 
 // Datasets
-	async getDatasets() {
-		const res = await fetch(GET_DATASETS_URL, { credentials: 'include' })
+	async getDatasets(search = "") {
+		const url = search ? `${GET_DATASETS_URL}/?search=${encodeURIComponent(search)}` : GET_DATASETS_URL
+		const res = await fetch(url, { credentials: 'include' })
 		const datasets = await res.json()
 		return datasets
 	},

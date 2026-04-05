@@ -23,35 +23,37 @@ function DatasetExplorer() {
 // UI
 	return (
 		<>
-			<div className="search-bar">
-					<label for="dataset-search"> Search: </label>
-					<input type="text" id="dataset-search" placeholder="06-04-2026" value={input} onChange={(e) => setInput(e.target.value)}></input>
-					<button className="button" onClick={onSearchDataset}> Search </button>
-			</div>
 			{ datasetsLoaded ? (
-				datasetSummaries.length > 0 ? (
-					<>
-						<div className="explorer">
-							{datasetSummaries.map(summary =>
-								<div key={summary.id} className="dataset-blk">
-									<span className="main-info">
-										<Link to={urls.dataset(summary.id)}	className="dataset-title">{summary.title}</Link>
-										<h4	className="date">{summary.date}</h4>
-									</span>
-									<p>
-										{summary.description}
-									</p>
-									<span className="toolbar">
-										<button	onClick={()	=> api.downloadDataset(summary.id, async () => api.getDatasetData(summary.id))}>Download</button>
-									</span>
-								</div>
-							)}
-						</div>
-					</>
-				) : (
-					<h3> No datasets found </h3>
-				)
-			) :	(
+				<>
+					<div className="search-bar">
+							<label for="dataset-search"> Search: </label>
+							<input type="text" id="dataset-search" placeholder="06-04-2026" value={input} onChange={(e) => setInput(e.target.value)}></input>
+							<button className="button" onClick={onSearchDataset}> Search </button>
+					</div>
+					{ datasetSummaries.length > 0 ? (
+						<>
+							<div className="explorer">
+								{datasetSummaries.map(summary =>
+									<div key={summary.id} className="dataset-blk">
+										<span className="main-info">
+											<Link to={urls.dataset(summary.id)}	className="dataset-title">{summary.title}</Link>
+											<h4	className="date">{summary.date}</h4>
+										</span>
+										<p>
+											{summary.description}
+										</p>
+										<span className="toolbar">
+											<button	onClick={()	=> api.downloadDataset(summary.id, async () => api.getDatasetData(summary.id))}>Download</button>
+										</span>
+									</div>
+								)}
+							</div>
+						</>
+					) : (
+						<h3> No datasets found </h3>
+					)}
+				</>
+			) : (
 				<h1> Loading datasets... </h1>
 			)}
 		</>

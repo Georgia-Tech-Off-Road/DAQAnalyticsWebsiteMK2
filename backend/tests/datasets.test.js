@@ -128,14 +128,25 @@ describe('Datasets API', () => {
         });
 
         test('should return multiple datasets', async () => {
-            insertTestDataset({ id: 'dataset-1', title: 'Dataset One' });
-            insertTestDataset({ id: 'dataset-2', title: 'Dataset Two' });
+            insertTestDataset({ id: 'dataset-1', title: 'Dataset One'});
+            insertTestDataset({ id: 'dataset-2', title: 'Dataset Two'});
 
             const response = await agent
                 .get('/datasets')
                 .expect(200);
 
             expect(response.body).toHaveLength(2);
+        });
+
+        test('should return correct dataset using search term', async() => {
+			insertTestDataset({ id: 'my-test-dataset', title: 'My test dataset', description: 'test dataset' })
+			insertTestDataset({id: 'my-test-dataset2', title: 'This is my second dataset', description: 'second dataset' })
+
+			const response = await agent
+				.get('/datasets/?search=test')
+				.expect(200);
+
+			expect(response.body).toHaveLength(1);
         });
     });
 

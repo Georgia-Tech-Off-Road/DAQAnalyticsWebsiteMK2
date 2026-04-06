@@ -4,16 +4,16 @@ on:
   workflow_dispatch:
 
 jobs:
-deploy:
-  runs-on: ubuntu-latest
-  steps:
-    - name: SSH and deploy
-      uses: appleboy/ssh-action@v1
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USER }}
-        key: ${{ secrets.EC2_SSH_KEY }}
-        script: |
-          cd /home/ec2-user/DAQAnalyticsWebsiteMK2/backend
-          chmod +x scripts/deploy.sh
-          ./scripts/deploy.sh
+	deploy:
+	  runs-on: ubuntu-latest
+	  steps:
+	    - name: SSH and deploy
+	      uses: appleboy/ssh-action@v1
+	      with:
+	        host: ${{ secrets.EC2_HOST }}
+	        username: ${{ secrets.EC2_USER }}
+	        key: ${{ secrets.EC2_SSH_KEY }}
+	        script: |
+	          cd /home/ec2-user/DAQAnalyticsWebsiteMK2/backend
+	          chmod +x scripts/deploy.sh
+	          ./scripts/deploy.sh

@@ -13,9 +13,6 @@ function Home() {
     // let [practice_status, practicesetStatus] = useState(false)
     return (
         <>
-            <a href={urls.uploadDataset()}> File Upload Page </a>
-            <a href={urls.uploadVehicle()}> Vehicle Upload Page </a>
-            <a href={urls.viewVehicles()}> Vehicle View Page </a>
             <a href={urls.datasetExplorer()}> Dataset Explorer </a>
             <a href={urls.localLogin()}> Login </a>
 

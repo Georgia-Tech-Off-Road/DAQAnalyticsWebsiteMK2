@@ -74,4 +74,18 @@ router.post('/', (req, res) => {
     }
 })
 
+router.delete('/:id', (req, res) => {
+	const { id } = req.params
+
+	try {
+		const stmt = db.prepare(`DELETE FROM Location WHERE id = ?`);
+		stmt.run(id)
+	} catch (err) {
+		console.error(`Error deleting location ${id} : ${err}`)
+		return res.status(500).json({ error: err.message })
+	}
+
+	return res.status(200).json({ message: `Location ${id} deleted` })
+})
+
 module.exports = router

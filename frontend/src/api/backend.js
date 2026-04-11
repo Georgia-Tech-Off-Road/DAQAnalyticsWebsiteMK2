@@ -5,6 +5,8 @@ const GET_VEHICLES_URL = `${API_BASE}/vehicles`
 
 // Locations
 const GET_LOCATIONS_URL = `${API_BASE}/locations`
+const POST_LOCATION_URL = `${API_BASE}/locations`
+const DELETE_LOCATION_URL = `${API_BASE}/locations`
 
 // Datasets
 const GET_DATASETS_URL = `${API_BASE}/datasets`
@@ -40,6 +42,29 @@ export const api = {
 		return locations
 	},
 
+	async postLocation(title, description, competition, latitude, longitude, parent_id) {
+		const res = await fetch(POST_LOCATION_URL, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			credentials: 'include',
+			body: JSON.stringify({
+				title, description, competition, latitude, longitude, parent_id
+			})
+		})
+
+		if (!res.ok) {
+			const text = await res.text()
+			try {
+				const body = JSON.parse(text)
+				throw new Error(body.error)
+		    } catch {
+			    throw new Error(text || `Request failed with status ${res.status}`)
+		  	}
+		}
+		let data = res.json()
+
+		return data
+	},
 // Datasets
 	async getDatasets(search = "") {
 		const url = search ? `${GET_DATASETS_URL}/?search=${encodeURIComponent(search)}` : GET_DATASETS_URL
@@ -64,6 +89,23 @@ export const api = {
 			method: 'DELETE',
 			credentials: 'include',
 		});
+		return res.json()
+	},
+
+	async deleteLocation(id) {
+		const res = await fetch(`${DELETE_LOCATION_URL}/${id}`, {
+			method: 'DELETE',
+			credentials: 'include',
+		});
+		if (!res.ok) {
+			const text = await res.text()
+			try {
+				const body = JSON.parse(text)
+				throw new Error(body.error)
+			} catch {
+				throw new Error(text || `Request failed with status ${res.status}`)
+			}
+		}
 		return res.json()
 	},
 

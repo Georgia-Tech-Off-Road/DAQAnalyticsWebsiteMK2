@@ -7,7 +7,7 @@ const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173'
 const express = require('express')
 const fs = require('node:fs')
 const app = express()
-const hostname = '0.0.0.0'
+const hostname = process.env.BACKEND_URL || 'localhost'
 const port = process.env.BACKEND_PORT
 const path = require('node:path')
 const cors = require('cors')
@@ -27,7 +27,10 @@ const session = require('express-session')({
         secret: SESSION_SECRET,
         resave: false,
         saveUninitialized: false,
-        cookie: { secure: (process.env.NODE_ENV === 'production') }
+        cookie: {
+	        secure: (process.env.NODE_ENV === 'production'),
+	        sameSite: 'lax'
+        }
 });
 
 const passport = require('./middleware/auth/passport')
@@ -55,9 +58,9 @@ app.use(express.json())
 app.use(session)
 app.use(passport.authenticate('session'))
 // Now define routes
-app.use("/datasets", requireAuth, datasets)
-app.use("/vehicles", requireAuth, vehicles)
-app.use("/locations", requireAuth, locations)
+app.use("/datasets", datasets)
+app.use("/vehicles", vehicles)
+app.use("/locations", locations)
 app.use("/auth", auth)
 
 app.get('/', (req, res) => {

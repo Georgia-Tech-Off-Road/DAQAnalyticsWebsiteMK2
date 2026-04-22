@@ -40,7 +40,7 @@ router.post('/logout', (req, res, next) => {
 
 // SAML Endpoints
 
-router.get('saml/login', passport.authenticate('saml'));
+router.get('/saml/login', passport.authenticate('saml'));
 
 router.post('/saml/callback',
 	passport.authenticate('saml', { failureRedirect: '/login' }),

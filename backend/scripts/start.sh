@@ -2,7 +2,7 @@ cross-env \
 DATABASE_PATH=database/data.db \
 MICROSERVICES_URL=http://127.0.0.1:5000 \
 SESSION_SECRET="hello world" \
-SAML_ENTRY_POINT="placeholder" \
+SAML_ENTRY_POINT="https://idp.gatech.edu/idp/profile/SAML2/Redirect/SSO" \
 SAML_CERT_PATH="sp-cert.pem" \
 SAML_PRIVATE_KEY_PATH="sp-key.pem" \
 SAML_DECRYPTION_PVK_PATH="sp-key.pem" \

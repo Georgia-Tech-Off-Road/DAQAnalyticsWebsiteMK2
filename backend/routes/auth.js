@@ -9,6 +9,8 @@ const fs = require('node:fs')
 
 passport.use(samlStrategy)
 
+const SAML_CERT_PATH = process.env.SAML_CERT_PATH;
+
 
 // Local Endpoints
 router.post('/local/login', (req, res, next) => {
@@ -69,8 +71,8 @@ router.get('/saml/metadata', (req, res) => {
 		return res.status(503).json({ error: 'SAML strategy not configured' });
 	}
 	const metadata = samlStrategy.generateServiceProviderMetadata(
-		null,
-		fs.readFileSync('sp-cert.pem', 'utf-8')
+		fs.readFileSync(SAML_CERT_PATH, 'utf-8'),
+		fs.readFileSync(SAML_CERT_PATH, 'utf-8')
 	);
 	res.type('application/xml');
 	res.send(metadata);

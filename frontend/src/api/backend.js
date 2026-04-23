@@ -17,7 +17,7 @@ const DELETE_DATASET_URL = `${API_BASE}/datasets/delete`
 
 // Auth
 const LOCAL_LOGIN_URL = `${API_BASE}/auth/local/login`
-const SSO_LOGIN_URL = `${API_BASED}/auth/saml/login`
+const SSO_LOGIN_URL = `${API_BASE}/auth/saml/login`
 const SESSION_URL = `${API_BASE}/auth/session`
 const LOGOUT_URL = `${API_BASE}/auth/logout`
 
@@ -159,16 +159,9 @@ export const api = {
 		return { ok: res.ok, status: res.status, data }
 	},
 
-	async SSOLogin() {
-		const res = await fetch(SSO_LOGIN_URL, {
-			method: 'POST',
-			credentials: 'include',
-			headers: { 'Content-Type': 'application/json' },
-		})
-
-		return { ok: res.ok, status: res.status }
+	getSAMLURL() {
+		return SSO_LOGIN_URL
 	},
-
 	async getSession() {
 		const res = await fetch(SESSION_URL, { credentials: 'include' })
 		if (!res.ok) return null

@@ -7,8 +7,11 @@ const passport = require("../middleware/auth/passport.js")
 const samlStrategy = require("../middleware/auth/samlStrategy")
 const fs = require('node:fs')
 
-passport.use(samlStrategy)
+if (samlStrategy) {
+	passport.use(samlStrategy)
+}
 
+const FRONTEND_URL = process.env.FRONTEND_URL;
 const SAML_CERT_PATH = process.env.SAML_CERT_PATH;
 
 
@@ -46,19 +49,7 @@ router.get('/saml/login', passport.authenticate('saml'));
 
 router.post('/saml/callback',
 	passport.authenticate('saml', { failureRedirect: '/login' }),
-	(req, res) => {
-		const profile = req.user
-		db.prepare(`
-			INSERT INTO User (email, display_name) VALUES (?, ?)
-		    ON CONFLICT (email) DO UPDATE SET display_name = excluded.display_name`)
-		.run(profile.email, profile.displayName);
-
-		const user = db.prepare(`SELECT id FROM User WHERE email = ?`).get(profile.email)
-
-		db.prepare(`
-			INSERT INTO AuthProvider (user_id, provider_type, provider_uid) VALUES (?, 'saml', ?) ON CONFLICT (provider_type, provider_uid) DO NOTHING`)
-		.run(user.id, profile.uid)
-
+	(req, res, next) => {
 		req.logIn(req.user, (err) => {
 			if (err) return next(err);
 			return res.redirect(`${FRONTEND_URL}/`)

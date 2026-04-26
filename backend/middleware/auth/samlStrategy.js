@@ -16,7 +16,7 @@ const SAML_IDP_METADATA_URL = process.env.SAML_IDP_METADATA_URL
 
 let samlStrategy = null;
 
-if (SAML_ENTRY_POINT && SAML_IDP_CERT1_PATH && SAML_IDP_CERT2_PATH && SAML_PRIVATE_KEY_PATH && SAML_DECRYPTION_PVK_PATH && SAML_IDP_METADATA_URL) {
+if (BACKEND_URL && SAML_ENTRY_POINT && SAML_IDP_CERT1_PATH && SAML_IDP_CERT2_PATH && SAML_PRIVATE_KEY_PATH && SAML_DECRYPTION_PVK_PATH && SAML_IDP_METADATA_URL) {
 	const cert1Path = path.resolve(__dirname, '../../', SAML_IDP_CERT1_PATH);
 	const cert1 = fs.readFileSync(cert1Path, 'utf-8');
 
@@ -41,15 +41,14 @@ if (SAML_ENTRY_POINT && SAML_IDP_CERT1_PATH && SAML_IDP_CERT2_PATH && SAML_PRIVA
 		},
 		function(profile, done) {
 			try {
-				const profile = req.user
-				db.prepare(`
+				db_lib.prepare(`
 					INSERT INTO User (email, display_name) VALUES (?, ?)
 				    ON CONFLICT (email) DO UPDATE SET display_name = excluded.display_name`)
 				.run(profile.email, profile.displayName);
 
-				const user = db.prepare(`SELECT id FROM User WHERE email = ?`).get(profile.email)
+				const user = db_lib.prepare(`SELECT id FROM User WHERE email = ?`).get(profile.email)
 
-				db.prepare(`
+				db_lib.prepare(`
 					INSERT INTO AuthProvider (user_id, provider_type, provider_uid) VALUES (?, 'saml', ?) ON CONFLICT (provider_type, provider_uid) DO NOTHING`)
 				.run(user.id, profile.uid)
 

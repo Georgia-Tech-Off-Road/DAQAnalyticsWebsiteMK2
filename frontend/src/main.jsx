@@ -13,7 +13,10 @@ import DatasetExplorer from "./pages/DatasetExplorer.jsx"
 import DatasetViewer from "./pages/DatasetViewer.jsx"
 import DatasetGraph from "./pages/DatasetGraph.jsx"
 import UploadDataset from "./pages/UploadDataset.jsx"
+
+import Login from "./pages/Login.jsx"
 import LocalLogin from "./pages/LocalLogin.jsx"
+
 import DatasetManager from "./pages/DatasetManager.jsx"
 import AuthErrorPage from "./pages/errorPages/AuthErrorPage.jsx"
 
@@ -36,6 +39,7 @@ createRoot(document.getElementById('root')).render(
                 <Route path={urls.datasetExplorer()} element={datasetExplorer} />
                 <Route path="/dataset/:id" element={datasetViewer} />
                 <Route path="/dataset/graph/:id" element={datasetGraph} />
+                <Route path={urls.login()} element={<Login />} />
                 <Route path={urls.localLogin()} element={<LocalLogin />} />
                 <Route path={urls.manager()} element={<DatasetManager />} />
 

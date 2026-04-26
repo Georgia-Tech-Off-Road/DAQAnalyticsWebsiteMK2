@@ -35,7 +35,7 @@ export function datasetGraph(id) {
 }
 
 export function login() {
-	return localLogin()
+	return '/login'
 }
 
 export function localLogin() {

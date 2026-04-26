@@ -14,7 +14,7 @@ function Home() {
     return (
         <>
             <a href={urls.datasetExplorer()}> Dataset Explorer </a>
-            <a href={urls.localLogin()}> Login </a>
+            <a href={urls.login()}> Login </a>
 
             <h1> Welcome to the Home Page! </h1>
             <img src = "https://gtor.gatech.edu/img/gtor-logo.jpg" alt = "GTOR logo" width="350"/>

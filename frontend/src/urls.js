@@ -6,6 +6,10 @@ export function test(text) {
     return `/test/${text}`
 }
 
+export function createLocation() {
+	return `/location/create`
+}
+
 export function uploadFile() {
     return '/UploadFile'
 }

@@ -7,6 +7,9 @@ import App from './App.jsx'
 import Test from "./Test.jsx"
 import UploadPage from "./UploadFile.jsx"
 import Home from "./Home.jsx"
+
+import CreateLocation from './pages/CreateLocation.jsx'
+
 import VehiclePage from "./VehicleSystems/UploadVehicle.jsx"
 import VehicleView from "./VehicleSystems/ViewVehicles.jsx"
 import DatasetExplorer from "./pages/DatasetExplorer.jsx"
@@ -26,6 +29,8 @@ import AuthRequired from "./lib/AuthRequired.jsx"
 const datasetExplorer = <AuthRequired> <DatasetExplorer /> </AuthRequired>
 const datasetViewer = <AuthRequired> <DatasetViewer /> </AuthRequired>
 const datasetGraph = <AuthRequired> <DatasetGraph /> </AuthRequired>
+const createLocation = <AuthRequired> <CreateLocation /> </AuthRequired>
+
 createRoot(document.getElementById('root')).render(
     <StrictMode>
         <BrowserRouter>
@@ -42,6 +47,8 @@ createRoot(document.getElementById('root')).render(
                 <Route path={urls.login()} element={<Login />} />
                 <Route path={urls.localLogin()} element={<LocalLogin />} />
                 <Route path={urls.manager()} element={<DatasetManager />} />
+
+                <Route path={urls.createLocation()} element={createLocation} />
 
        			# Error pages
 
